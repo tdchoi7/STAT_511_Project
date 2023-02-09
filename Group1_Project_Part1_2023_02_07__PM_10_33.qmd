@@ -1,0 +1,223 @@
+---
+title: "Project Part 1"
+subtitle: "STAT 511"
+author: "Moses Sanches, Shuyu Wang, Theodore Choi"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    number_section: false
+    highlight: tango
+---
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Project Part 1
+
+```{r}
+#| message: false
+# Libraries we used
+library(openintro)
+library(tidyverse)
+library(broom)
+library(pastecs)
+library(countrycode)
+```
+
+## Find a dataset that meets the following criteria:
+
+```{r}
+# load data (must have file in correct project folder)
+life_exp <- read.csv("./data/Life Expectancy Data.csv")
+
+# add continent to dataset
+# https://stackoverflow.com/questions/47510141/get-continent-name-from-country-name-in-r
+life_exp$Continent <- countrycode(sourcevar = life_exp[,"Country"],
+                                  origin = "country.name",
+                                  destination = "continent")
+
+# set the response variable to the Life.expectancy column as y
+# this may not be necessary, but was done preemptively for the linear model
+y <- life_exp$Life.expectancy
+
+# remove the response variable from the dataframe and assign to x
+# this may not be necessary, but was done preemptively for the linear model
+x <- life_exp[,-4]
+
+# print top 5
+head(y)
+```
+
+> - This dataset is of interest to us
+> - The dataset has a response variable that is a continuous numeric variable as evidenced by the printout above
+> - The dataset has `r ncol(x)` columns excluding the response variable (including the column we added for Continents)
+>   - The binary variable is the Status column, which indicates if the country is a developing country or a developed country
+>   - A variable that can be classified as categorical with more than 2 categories would be the year
+>   - The Alcohol and BMI columns can be continuous variables and the Measles and Population columns could be discrete variables
+
+
+## 1. Provide a brief description of the dataset and where you obtained it
+> This dataset contains factors pertinent to health, education, economic status, and other demographics including average life expectancy of 193 countries from the years 2000 to 2015. The original dataset was found on the WHO data repository website and the subsequent transformation was found on Kaggle.  The link to the dataset (subsequent transformation) we will be using can be found here:
+
+- https://www.kaggle.com/datasets/kumarajarshi/life-expectancy-who?resource=download
+
+
+## 2. Briefly summarize the data set. How many variables?  What types are they? How many observations?  Is there missing data?
+> The original dataset has 22 columns including the response variable and contains 2938 rows. We added a column that gives us the continents of the countries listed in the Country column for ease of creating clearer visuals, bringing the total number of columns including the response variable to 23. There are binary, categorical, continuous, and discrete data. Missing Data has already been handled using Missmap by the people who sourced this cleaned dataset (originally provided by the WHO) excluded several countries including Vanuatu, Tonga, Togo, and Cabo Verde.
+
+
+## 3. Explore and get familiar with the data.
+#### A. Produce appropriate summaries for each variable (based on variable type) – mean/standard deviation etc for continuous/discrete and frequencies for categorical
+```{r}
+# getting summaries of the variables
+# string values did not return summary statistics
+summary_num <- stat.desc(select_if(life_exp, is.numeric))
+round(summary_num, 2)
+
+# frequency of status by country
+table(life_exp$Continent, life_exp$Status) 
+```
+
+#### B. Produce visual summaries (one for each variable based on variable type) – boxplots/histograms or bar charts.
+```{r}
+# Getting counts of the Status (Developing vs developed)
+counts_status <- table(life_exp$Status)
+
+# Plotting a bar chart of the counts
+barplot(counts_status,
+        main = "Status Counts",
+        ylab = "Counts",
+        xlab = "Status")
+
+# Getting frequency of Adult Mortality
+# Defined as:
+# "Adult Mortality Rates of both sexes
+# (probability of dying between 15 and 60 years per 1000 population)"
+hist(life_exp$Adult.Mortality,
+     main = "Histogram of Adult Mortality",
+     xlab = "Adult Mortality")
+
+# Consumption of Alcohol per capita (15+) in liters
+hist(life_exp$Alcohol,
+     main = "Histogram of Alcohol",
+     xlab = "Alcohol Consumption")
+
+# Hepatitis B (HepB) immunization coverage among 1-year-olds (%)
+hist(life_exp$Hepatitis.B,
+     main = "Histogram of Hepatits B",
+     xlab = "Infected with Hepatitis B")
+
+# Year
+hist(life_exp$Year,
+     main = "Histogram of year",
+     xlab = "Years")
+
+# Plotting a bar chart of the  Continent counts
+# (too many countries to plot cleanly)
+counts_continent <- table(life_exp$Continent)
+barplot(counts_continent,
+        main = "Count of Continents",
+        ylab = "Counts",
+        xlab = "Continents")
+
+# infant deaths
+hist(life_exp$infant.deaths,
+     main = "Histogram of Infant Deaths",
+     xlab = "Infant Deaths")
+
+# percentage expenditure 
+hist(life_exp$percentage.expenditure,
+     main = "Histogram of Percentage Expenditure",
+     xlab = "Percent Expenditure")
+
+#Measles
+hist(life_exp$Measles,
+     main = "Histogram of Measles",
+     xlab = "Infected with Measles")
+
+# BMI
+hist(life_exp$BMI,
+     main = "Histogram of BMI",
+     xlab = "BMI")
+
+# under 5 deaths
+hist(life_exp$under.five.deaths,
+     main = "Histogram of Under 5 Deaths",
+     xlab = "Amount of deaths under 5")
+
+# Polio
+hist(life_exp$Polio,
+     main = "Histogram of Polio Occurence",
+     xlab = "Polio Occurrence")
+
+# Total Expenditure
+hist(life_exp$Total.expenditure,
+     main = "Histogram of Total Expenditure",
+     xlab = "Total Expenditure")
+
+# Diphtheria
+hist(life_exp$Diphtheria,
+     main = "Histogram of Frequency of Diphtheria",
+     xlab = "Diphtheria")
+
+# AIDS
+hist(life_exp$HIV.AIDS,
+     main = "Histogram of Frequency of HIV AIDS",
+     xlab = "HIV AIDS")
+
+# GDP
+hist(life_exp$GDP,
+     main = "Histogram of GDP",
+     xlab = "GDP")
+
+# Population
+hist(life_exp$Population,
+     main = "Histogram of Population",
+     xlab = "Population")
+
+# Thinness(1-19 years):
+# Prevalence of thinness among children and adolescents for Age 10 to 19 (%)
+hist(life_exp$thinness..1.19.years,
+     main = "Histogram of Thinness from age 10 to 19",
+     xlab = "Age")
+
+# Thinness(5-9 years):Prevalence of thinness among children for Age 5 to 9(%)
+hist(life_exp$thinness.5.9.years,
+     main = "Histogram of Thinness from age 5 to 9",
+     xlab = "Age")
+
+# Income Composition of Resources:
+# Human Development Index in terms of income composition of resources
+# (index ranging from 0 to 1)
+hist(life_exp$Income.composition.of.resources,
+     main = "Histogram of Resource Composition",
+     xlab = "Index")
+
+# Schooling:Number of years of Schooling(years)
+hist(life_exp$thinness.5.9.years,
+     main = "Histogram of Years of Schooling",
+     xlab = "Years")
+
+# plotting a histogram of the response variable (life expectancy)
+hist(y,
+     main = "Histogram of Life Expectancy",
+     xlab = "Age")
+
+# boxplot of life expectancy across the continents
+life_exp %>%
+  ggplot(aes(x = Continent,
+             y = Life.expectancy,
+             fill = Continent)) +
+  geom_boxplot(outlier.color = "black",
+               outlier.shape = 16,
+               outlier.size = 2,
+               notch = FALSE)
+```
+
+#### C. Are there any potential issues with any of the data?
+> The data still has some missing values and can be a little difficult to interpret - use of the data descriptors found in the link is highly recommended. The Life Expectancy column (response variable) is skewed left, so some transformations may have to be performed to ensure a normal curve. We can also see skewed distributions across the variables (Histogram of Infant Deaths and Histogram of Under 5 Deaths among others), possible missing data (as seen in Histogram of Total Expenditure), as well as possible outliers (as seen in Histogram of Population,the Histograms of thinness). Another interesting issue that we can see is a bimodal distribution (as seen in the Histogram of BMI). There may also be issues with the frequency of the number of years for the early 2000s as there is a lot of data for 2000.
