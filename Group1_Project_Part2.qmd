@@ -1,5 +1,5 @@
 ---
-title: "Project Part 1"
+title: "Project Part 2"
 subtitle: "STAT 511"
 author: "Moses Sanches, Shuyu Wang, Theodore Choi"
 date: "`r Sys.Date()`"
@@ -17,7 +17,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Project Part 1
+# Project Part 2
 
 ```{r}
 #| message: false
@@ -34,8 +34,7 @@ library(countrycode)
 > - Do demographics affect life expectancy?
 
 ## Part B
-#### Document any initial data cleaning steps you take – e.g. changing variable names, converting 
-characters to factors, etc.
+#### 1. Document any initial data cleaning steps you take – e.g. changing variable names, converting characters to factors, etc.
 
 ```{r}
 # load data (must have file in correct project folder)
@@ -86,16 +85,106 @@ y <- life_exp$longevity
 # remove the response variable from the dataframe and assign to x
 # this may not be necessary, but was done preemptively for the linear model
 x <- life_exp[,-4]
+```
 
+#### 2. Filter the data to remove any rows that have a missing value for your main response variable. Make note of how many observations this removes. 
+```{r}
 # check summary to determine if there are nulls
 summary(y)
+```
 
-# remove the null values
+> There are 10 null values in the label
+
+```{r}
+# check if there are -99s
+# NA means there are no -99 values
+any(life_exp$longevity == -99)
+```
+
+> There are no -99 values in the label
+
+```{r}
+# check if there are any 'NA's in the columns
+# we used regex to check if there are any characters at all in the column
+# NA means there are no characters in the column
+sum(str_detect(life_exp$longevity, '[a-zA-Z]')) > 0
+```
+
+> There are no character values in the column, which means there are no 'NA' values or combinations of lowercase and uppercase characters that could be portrayed as 'NA' in the column
+
+```{r}
+# remove the null values and assign the new dataframe with removed nulls to new variable
 life_exp1 <- life_exp[complete.cases(life_exp$longevity),]
 
-# check for nulls
+# check for nulls in the summary
 summary(life_exp1$longevity)
 ```
-> Seems like the rows where the response variable was null have been removed
+
+> Removing the null values from the response variable resulted in the removal of 10 rows
+
+#### 3. Narrow down your dataset to a pool of 10 – 20 potential predictor variables. You should document your decisions and justifications. Some things to consider: 
+###### a. Which variables are of substantive interest to your research question?
+```{r}
+# Creating boxplots of continent vs longevity
+ctry_long_boxplt <- ggplot(data = life_exp1,
+                           aes(x = reorder(continent, -longevity), # reordering the columns by mean value
+                               y = longevity)) +
+                    geom_boxplot() +
+                    coord_flip() # flipping coordinates to see boxplot horizontally
+                    labs(title = "Boxplot of Life Expectancy by Continent")
+
+ctry_long_boxplt
+```
+
+> The boxplot indicates that some continents have a skewed distribution as the median does not align with the mean
+
+```{r}
+# Creating boxplots of year vs longevity
+year_long_boxplt <- ggplot(data = life_exp1,
+                           aes(x = year, # reordering the columns by mean value
+                               y = longevity,
+                               group = year)) +
+                    geom_boxplot() +
+                    coord_flip() # flipping coordinates to see boxplot horizontally
+                    labs(title = "Boxplot of Life Expectancy by Year")
+
+year_long_boxplt
+```
+
+> The boxplot indicates that as the years progress, the median life expectancy tends to increase
+
+```{r}
+
+```
+
+
+
+###### b. Which ones aren’t of substantive interest, and why? For example, there may be some administrative variables (e.g. phone number or website) or others deemed irrelevant to the research question. 
+>
+
+###### c. Are there variables that are unusable due to large amounts of missingness?
+```{r}
+
+```
+
+###### d. Are there multiple variables that measure very similar things or should be combined into one variable (e.g. a column for both hours and minutes)? Inspecting a correlation matrix of the data is useful here 
+
+#### 4. Inspect your missing data again and try to gain understanding about what is missing and why.  
+###### a. Read the dataset’s documentation/codebook for insight.
+
+> 
+
+###### b. Check if there are other values stored as -99 or NA that may indicate missingness. 
+```{r}
+
+```
+
+###### c. Provide a brief summary of the missingness 
+
+
+
+
+
+
 
 
