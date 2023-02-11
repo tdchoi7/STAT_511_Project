@@ -182,8 +182,13 @@ year_long_boxplt
 ###### c. Provide a brief summary of the missingness 
 
 
+###### 5. Document what you decide to do about the missingness, and provide the code for filtering out any observations, if applicable.
 
 
+###### 6. Document any other data cleaning steps you take, if applicable
+
+
+###### 7. Save your cleaned dataset as a .csv or .RDS (use the function write_csv() or write_rds()). Make sure to name it differently from your original dataset (e.g. data_cleaned or data_for_analysis) and save it in your data folder.  
 
 
 
