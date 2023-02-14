@@ -96,6 +96,45 @@ summary(y)
 > There are 10 null values in the label
 
 ```{r}
+# remove the null values and assign the new dataframe with removed nulls to new variable
+life_exp1 <- life_exp[complete.cases(life_exp$longevity),]
+
+# check for nulls in the summary
+summary(life_exp1$longevity)
+```
+
+> Removing the null values from the response variable resulted in the removal of 10 rows
+
+#### 3. Narrow down your dataset to a pool of 10 – 20 potential predictor variables. You should document your decisions and justifications. Some things to consider: 
+###### a. Which variables are of substantive interest to your research question?
+
+>  The year(2012), life expectancy, adult mortality, BMI, Alcohol, Hepatitis B, Schooling, Polio, Diphtheria, and Measles. The year 2012 was chosen, since thats where the highest count was. Alcohol, Hepatitis B,  Diphtheria, Measles, Polio were chosen because they are factors that influence health and affect life expectancy. Life expectancy and Adult Mortality help give a big picture of most common ages that both genders are passing away. 
+
+
+###### b. Which ones aren’t of substantive interest, and why? For example, there may be some administrative variables (e.g. phone number or website) or others deemed irrelevant to the research question. 
+
+> There were multiple variables that could of been used to help us answer our research question, but there wasn't much variation in the data or it wasn't relevant enough. Some of the variables that couldn't be of use due to the data provided included infant deaths and under 5 deaths due to their values falling under a single range. For example, in under 5 deaths, the data ranged from 0-2500 and the values were only between 0-250. The thinness variables were ones that didnt seem relevant enough to include because they looked vague.
+
+###### c. Are there variables that are unusable due to large amounts of missingness?
+```{r}
+sum(is.na(life_exp$gdp))
+sum(is.na(life_exp$pop))
+sum(is.na(life_exp$hep_b))
+
+#The variables population, hepatitis B, and gdp were the most unstable variables due to them having greater than or equal to 15% of their data missing.
+```
+
+###### d. Are there multiple variables that measure very similar things or should be combined into one variable (e.g. a column for both hours and minutes)? Inspecting a correlation matrix of the data is useful here 
+
+> The thinness of 1-19 and 5-9 years could be combined so that there is just one graph showing prevelance of thinness for ages 5-19.
+
+#### 4. Inspect your missing data again and try to gain understanding about what is missing and why.  
+###### a. Read the dataset’s documentation/codebook for insight.
+
+> From the variables we chose to include, only hepatitis B had a high missing data percentage. This is due to a country not producing enough information regarding hepatitis B during that year.
+
+###### b. Check if there are other values stored as -99 or NA that may indicate missingness. 
+```{r}
 # check if there are -99s
 # NA means there are no -99 values
 any(life_exp$longevity == -99)
@@ -112,78 +151,13 @@ sum(str_detect(life_exp$longevity, '[a-zA-Z]')) > 0
 
 > There are no character values in the column, which means there are no 'NA' values or combinations of lowercase and uppercase characters that could be portrayed as 'NA' in the column
 
-```{r}
-# remove the null values and assign the new dataframe with removed nulls to new variable
-life_exp1 <- life_exp[complete.cases(life_exp$longevity),]
-
-# check for nulls in the summary
-summary(life_exp1$longevity)
-```
-
-> Removing the null values from the response variable resulted in the removal of 10 rows
-
-#### 3. Narrow down your dataset to a pool of 10 – 20 potential predictor variables. You should document your decisions and justifications. Some things to consider: 
-###### a. Which variables are of substantive interest to your research question?
-```{r}
-# Creating boxplots of continent vs longevity
-ctry_long_boxplt <- ggplot(data = life_exp1,
-                           aes(x = reorder(continent, -longevity), # reordering the columns by mean value
-                               y = longevity)) +
-                    geom_boxplot() +
-                    coord_flip() # flipping coordinates to see boxplot horizontally
-                    labs(title = "Boxplot of Life Expectancy by Continent")
-
-ctry_long_boxplt
-```
-
-> The boxplot indicates that some continents have a skewed distribution as the median does not align with the mean
-
-```{r}
-# Creating boxplots of year vs longevity
-year_long_boxplt <- ggplot(data = life_exp1,
-                           aes(x = year, # reordering the columns by mean value
-                               y = longevity,
-                               group = year)) +
-                    geom_boxplot() +
-                    coord_flip() # flipping coordinates to see boxplot horizontally
-                    labs(title = "Boxplot of Life Expectancy by Year")
-
-year_long_boxplt
-```
-
-> The boxplot indicates that as the years progress, the median life expectancy tends to increase
-
-```{r}
-
-```
-
-
-
-###### b. Which ones aren’t of substantive interest, and why? For example, there may be some administrative variables (e.g. phone number or website) or others deemed irrelevant to the research question. 
->
-
-###### c. Are there variables that are unusable due to large amounts of missingness?
-```{r}
-
-```
-
-###### d. Are there multiple variables that measure very similar things or should be combined into one variable (e.g. a column for both hours and minutes)? Inspecting a correlation matrix of the data is useful here 
-
-#### 4. Inspect your missing data again and try to gain understanding about what is missing and why.  
-###### a. Read the dataset’s documentation/codebook for insight.
-
-> 
-
-###### b. Check if there are other values stored as -99 or NA that may indicate missingness. 
-```{r}
-
-```
-
 ###### c. Provide a brief summary of the missingness 
 
+> There are no 'NAs' or '99s' in our data, but there blank spaces where there should be values.
 
 ###### 5. Document what you decide to do about the missingness, and provide the code for filtering out any observations, if applicable.
 
+> We will fill the blank spaces with NA values so we can account for them.
 
 ###### 6. Document any other data cleaning steps you take, if applicable
 
