@@ -307,11 +307,6 @@ ggplot(data = life_exp, aes(x = school, y = longevity)) +
 There are two categorical predictor. Country and Status. 2938 observations in each predictor.
 
 ```{r}
-# categorical_predictor <- data.frame(Country = c('Cook Islands', 'Kiribati', 'Kiribati', 'Kiribati', 'Kiribati', 'Kiribati'),
-#                                     Status = c('Developing', 'Developing', 'Developing', 'Developing', 'Developing', 'Developing'))
-```
-
-```{r}
 
 # plot boxplot of life expectancy across continents
 ggplot(life_exp1,
