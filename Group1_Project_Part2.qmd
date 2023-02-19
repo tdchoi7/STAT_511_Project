@@ -39,7 +39,7 @@ library(countrycode)
 ```{r}
 # load data (must have file in correct project folder)
 life_exp <- read.csv("./data/Life Expectancy Data.csv")
-life_exp
+# life_exp
 
 # add continent to dataset
 # https://stackoverflow.com/questions/47510141/get-continent-name-from-country-name-in-r
@@ -119,12 +119,24 @@ summary(life_exp1$longevity)
 
 ###### c. Are there variables that are unusable due to large amounts of missingness?
 ```{r}
-sum(is.na(life_exp$gdp))
-sum(is.na(life_exp$pop))
-sum(is.na(life_exp$hep_b))
+# show counts of missingness
+# first get total row count 
+count_rows <- nrow(life_exp)
 
-#The variables population, hepatitis B, and gdp were the most unstable variables due to them having greater than or equal to 15% of their data missing.
+# Then get sum of NAs
+sum_na_gdp <- sum(is.na(life_exp$gdp))
+# Then divide by rows to get percentage
+per_na_gdp <- (sum_na_gdp / count_rows) * 100
+
+# repeat steps for population and hep b
+sum_na_pop <- sum(is.na(life_exp$pop))
+per_na_pop <- (sum_na_pop / count_rows) * 100
+
+sum_na_hepb <- sum(is.na(life_exp$hep_b))
+per_na_hepb <- (sum_na_hepb / count_rows) * 100
 ```
+
+> The variables population (missing `r sum_na_pop` rows, which is `r round(per_na_pop, 2)`% missing), hepatitis B(missing `r sum_na_hepb` rows, which is `r round(per_na_hepb, 2)`% missing), and gdp (missing `r sum_na_gdp` rows, which is `r round(per_na_gdp, 2)`% missing) were the most unstable variables due to them having at least 15% of their data missing.
 
 ###### d. Are there multiple variables that measure very similar things or should be combined into one variable (e.g. a column for both hours and minutes)? Inspecting a correlation matrix of the data is useful here 
 
@@ -133,7 +145,7 @@ sum(is.na(life_exp$hep_b))
 #### 4. Inspect your missing data again and try to gain understanding about what is missing and why.  
 ###### a. Read the dataset’s documentation/codebook for insight.
 
-> From the variables we chose to include, only hepatitis B had a high missing data percentage. This is due to a country not producing enough information regarding hepatitis B during that year.
+> From the variables we chose to include, hepatitis B, population, and gdp were missing in larger percentages. This is due to a country not producing enough information regarding hepatitis B during that year.
 
 ###### b. Check if there are other values stored as -99 or NA that may indicate missingness. 
 ```{r}
@@ -177,11 +189,16 @@ sum(str_detect(life_exp$longevity, '[a-zA-Z]')) > 0
 
 ## Part C
 
-#### 1. histogram of your response variable
+#### 1. First, provide a histogram of your response variable by itself
 ```{r}
-hist(life_exp$longevity,
-     main = "Histogram of life expectancy",
-     xlab = "Response variable")
+# create a histogram of life expectancy 
+ggplot(life_exp, aes(x = longevity)) +
+  geom_histogram() +
+  labs(title = "Histogram of life expectancy")
+
+# hist(life_exp$longevity,
+#      main = "Histogram of life expectancy",
+#      xlab = "Response variable")
 ```
 
 #### 2. For each continuous predictor
