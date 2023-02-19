@@ -12,14 +12,17 @@ output:
 ---
 
 ```{r}
+
 #| label: setup
 #| include: false
 knitr::opts_chunk$set(echo = TRUE)
+
 ```
 
 # Project Part 2
 
 ```{r}
+
 #| message: false
 # Libraries we used
 library(openintro)
@@ -27,6 +30,7 @@ library(tidyverse)
 library(broom)
 library(pastecs)
 library(countrycode)
+
 ```
 
 ## Part A
@@ -37,6 +41,10 @@ library(countrycode)
 #### 1. Document any initial data cleaning steps you take – e.g. changing variable names, converting characters to factors, etc.
 
 ```{r}
+
+# Information regarding data from:
+# https://www.kaggle.com/datasets/kumarajarshi/life-expectancy-who?resource=download
+
 # load data (must have file in correct project folder)
 life_exp <- read.csv("./data/Life Expectancy Data.csv")
 # life_exp
@@ -54,24 +62,24 @@ life_exp <- life_exp %>%
     year = Year,
     status = Status,
     longevity = Life.expectancy,
-    adult_mort = Adult.Mortality,
-    inf_death = infant.deaths,
-    alcohol = Alcohol,
-    perc_exp = percentage.expenditure,
-    hep_b = Hepatitis.B,
-    measles = Measles,
-    bmi = BMI,
-    u5_deaths = under.five.deaths,
-    polio = Polio,
-    tot_exp = Total.expenditure,
-    dipth = Diphtheria,
-    aids = HIV.AIDS,
-    gdp = GDP,
+    adult_mort = Adult.Mortality, # number of deaths aged 15 - 60 per 1000 people
+    inf_death = infant.deaths, # number  of infant deaths per 1000 people
+    alcohol = Alcohol, # Liters of pure alcohol consumed per capita (15 YO +)
+    perc_exp = percentage.expenditure, # % Expenditure on health as percentage of GDP per Capita
+    hep_b = Hepatitis.B, # % of 1 YO immunized against Hep B
+    measles = Measles, # Number of reported cases per 1000 people
+    bmi = BMI, # Average BMI for population
+    u5_deaths = under.five.deaths, # number of under 5 deaths per 1000
+    polio = Polio, # % of 1 YO immunized against polio
+    tot_exp = Total.expenditure, # % general gov expenditure on health vs total gov expenditure
+    dipth = Diphtheria, # % 1 YO vaccinated TDaP
+    aids = HIV.AIDS, # deaths per 1000 live births HIV/AIDS (0-4 years)
+    gdp = GDP, # GDP per captia in USD
     pop = Population,
-    thin_1_19 = thinness..1.19.years,
-    thin_5_9 = thinness.5.9.years,
-    inc_comp = Income.composition.of.resources,
-    school = Schooling
+    thin_1_19 = thinness..1.19.years, # % prevalence of thinness among 10 - 19 YO 
+    thin_5_9 = thinness.5.9.years, # % prevalence of thinness among 5 - 9 YO 
+    inc_comp = Income.composition.of.resources, # Human Development Index - income composition of resources
+    school = Schooling # number of years of schooling
   )
 
 # change character columns to factors
@@ -87,22 +95,27 @@ y <- life_exp$longevity
 # remove the response variable from the dataframe and assign to x
 # this may not be necessary, but was done preemptively for the linear model
 x <- life_exp[,-4]
+
 ```
 
 #### 2. Filter the data to remove any rows that have a missing value for your main response variable. Make note of how many observations this removes. 
 ```{r}
+
 # check summary to determine if there are nulls
 summary(y)
+
 ```
 
 > There are 10 null values in the label
 
 ```{r}
+
 # remove the null values and assign the new dataframe with removed nulls to new variable
 life_exp1 <- life_exp[complete.cases(life_exp$longevity),]
 
 # check for nulls in the summary
 summary(life_exp1$longevity)
+
 ```
 
 > Removing the null values from the response variable resulted in the removal of 10 rows
@@ -119,6 +132,7 @@ summary(life_exp1$longevity)
 
 ###### c. Are there variables that are unusable due to large amounts of missingness?
 ```{r}
+
 # show counts of missingness
 # first get total row count 
 count_rows <- nrow(life_exp)
@@ -134,6 +148,7 @@ per_na_pop <- (sum_na_pop / count_rows) * 100
 
 sum_na_hepb <- sum(is.na(life_exp$hep_b))
 per_na_hepb <- (sum_na_hepb / count_rows) * 100
+
 ```
 
 > The variables population (missing `r sum_na_pop` rows, which is `r round(per_na_pop, 2)`% missing), hepatitis B(missing `r sum_na_hepb` rows, which is `r round(per_na_hepb, 2)`% missing), and gdp (missing `r sum_na_gdp` rows, which is `r round(per_na_gdp, 2)`% missing) were the most unstable variables due to them having at least 15% of their data missing.
@@ -145,22 +160,26 @@ per_na_hepb <- (sum_na_hepb / count_rows) * 100
 #### 4. Inspect your missing data again and try to gain understanding about what is missing and why.  
 ###### a. Read the dataset’s documentation/codebook for insight.
 
-> From the variables we chose to include, hepatitis B, population, and gdp were missing in larger percentages. This is due to a country not producing enough information regarding hepatitis B during that year.
+> From the variables we chose to include, hepatitis B, population, and gdp were missing in larger percentages. According to the documentation, lesser known countries provided less data regarding the 3 aformentioned variables.
 
 ###### b. Check if there are other values stored as -99 or NA that may indicate missingness. 
 ```{r}
+
 # check if there are -99s
 # NA means there are no -99 values
 any(life_exp$longevity == -99)
+
 ```
 
 > There are no -99 values in the label
 
 ```{r}
+
 # check if there are any 'NA's in the columns
 # we used regex to check if there are any characters at all in the column
 # NA means there are no characters in the column
 sum(str_detect(life_exp$longevity, '[a-zA-Z]')) > 0
+
 ```
 
 > There are no character values in the column, which means there are no 'NA' values or combinations of lowercase and uppercase characters that could be portrayed as 'NA' in the column
@@ -178,12 +197,14 @@ sum(str_detect(life_exp$longevity, '[a-zA-Z]')) > 0
 
 ##### 7. Save your cleaned dataset as a .csv or .RDS (use the function write_csv() or write_rds()). Make sure to name it differently from your original dataset (e.g. data_cleaned or data_for_analysis) and save it in your data folder.  
 ```{r}
+
 #
 #
 #
 #
 #
 #
+
 ```
 
 
@@ -191,32 +212,46 @@ sum(str_detect(life_exp$longevity, '[a-zA-Z]')) > 0
 
 #### 1. First, provide a histogram of your response variable by itself
 ```{r}
-# create a histogram of life expectancy 
-ggplot(life_exp, aes(x = longevity)) +
-  geom_histogram() +
-  labs(title = "Histogram of life expectancy")
 
-# hist(life_exp$longevity,
-#      main = "Histogram of life expectancy",
-#      xlab = "Response variable")
+# plotting histogram of life expectancy 
+ggplot(life_exp1, aes(x = longevity)) +
+  geom_histogram(binwidth = 5) +
+  labs(title = "Histogram of Life Expectancy") +
+  ylab("Count of Ages") +
+  xlab("Longevity")
+
 ```
 
 #### 2. For each continuous predictor
+###### a. Create a scatterplot (response on y axis, predictor on x axis)
+###### b. Comment on the relationship – does it appear to be linear? Strong/weak? Positive/negative? 
+###### c. Are there outliers?
+
 ```{r}
 
+# Plotting Alcohol vs Life Expectancy
 ggplot(data = life_exp, aes(x = alcohol, y = longevity)) +
-  geom_point()
+  geom_point() +
+  labs(title = "Plot of Alcohol vs Life Expectancy") +
+  ylab("Longevity") +
+  xlab("Alcohol")
 
 ```
 
-> It doesn't seem to have any linear relationship, the regression line is probably flat. If Alcohol and life expectancy is independent, then I believe there's not outliers.
+> It doesn't seem to have any linear relationship, the regression line is probably somewhere near 0. If alcohol and life expectancy are independent, then I believe there are no outliers.
 
 ```{r}
+
+# Plotting Percentage Expenditure vs Life Expectancy
 ggplot(data = life_exp, aes(x = perc_exp, y = longevity)) +
-  geom_point()
+  geom_point() +
+  labs(title = "Plot of Alcohol vs Life Expectancy") +
+  ylab("Longevity") +
+  xlab("Alcohol")
+  
 ```
 
-> It looks like there is some relationship between percentage expenditure and life expectancy but it's curve instead of linear. It seems every variable is good.
+> It looks like there is some relationship between percentage expenditure and life expectancy but it's curved instead of linear without outliers.
 
 ```{r}
 ggplot(data = life_exp, aes(x = bmi, y = longevity)) +
@@ -272,16 +307,24 @@ ggplot(data = life_exp, aes(x = school, y = longevity)) +
 There are two categorical predictor. Country and Status. 2938 observations in each predictor.
 
 ```{r}
-categorical_predictor <- data.frame(Country = c('Cook Islands', 'Kiribati', 'Kiribati', 'Kiribati', 'Kiribati', 'Kiribati'),
-                                    Status = c('Developing', 'Developing', 'Developing', 'Developing', 'Developing', 'Developing'))
+# categorical_predictor <- data.frame(Country = c('Cook Islands', 'Kiribati', 'Kiribati', 'Kiribati', 'Kiribati', 'Kiribati'),
+#                                     Status = c('Developing', 'Developing', 'Developing', 'Developing', 'Developing', 'Developing'))
 ```
 
 ```{r}
-# side by side boxplot
 
-#ggplot(data = life_exp, aes(x = continent)) +
-
-#  geom_histogram(binwidth = 10)
+# plot boxplot of life expectancy across continents
+ggplot(life_exp1,
+       aes(x = continent,
+           y = longevity,
+           fill = continent)) +
+  geom_boxplot(outlier.color = "black",
+               outlier.shape = 16,
+               outlier.size = 2,
+               notch = FALSE) +
+  labs(title = "Boxplot of Life Expectancy Across Continents") +
+  ylab("Longevity") +
+  xlab("Continents")
 
 ```
 
