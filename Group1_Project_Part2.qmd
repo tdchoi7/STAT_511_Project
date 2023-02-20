@@ -221,7 +221,7 @@ sum(str_detect(life_exp$longevity, '[a-zA-Z]')) > 0
 
 ##### 5. Document what you decide to do about the missingness, and provide the code for filtering out any observations, if applicable.
 
-> We will fill the blank spaces with NA values so we can account for them.
+> We will leave the blank spaces alone. We won't take out any rows or columns because of the information attached to them.
 
 ##### 6. Document any other data cleaning steps you take, if applicable
 
