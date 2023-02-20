@@ -155,7 +155,12 @@ per_na_hepb <- (sum_na_hepb / count_rows) * 100
 
 ###### d. Are there multiple variables that measure very similar things or should be combined into one variable (e.g. a column for both hours and minutes)? Inspecting a correlation matrix of the data is useful here 
 
-> The thinness of 1-19 and 5-9 years could be combined so that there is just one graph showing prevelance of thinness for ages 5-19.
+```{r}
+cor.life_exp=cor(life_exp[sapply(life_exp1,is.numeric)])
+corrplot(cor.life_exp)
+```
+
+> Measles could be combined with infant death and deaths under 5 years. Also infant deaths and deaths under 5 years, since they had the highest corrleation.
 
 #### 4. Inspect your missing data again and try to gain understanding about what is missing and why.  
 ###### a. Read the dataset’s documentation/codebook for insight.
