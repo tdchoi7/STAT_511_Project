@@ -259,8 +259,11 @@ ggplot(life_exp1, aes(x = longevity)) +
 ```
 
 #### 2. For each continuous predictor
+
 ###### a. Create a scatterplot (response on y axis, predictor on x axis)
-###### b. Comment on the relationship – does it appear to be linear? Strong/weak? Positive/negative? 
+
+###### b. Comment on the relationship -- does it appear to be linear? Strong/weak? Positive/negative?
+
 ###### c. Are there outliers?
 
 ```{r}
@@ -290,50 +293,78 @@ ggplot(data = life_exp, aes(x = perc_exp, y = longevity)) +
 > It looks like there is some relationship between percentage expenditure and life expectancy but it's curved instead of linear without outliers.
 
 ```{r}
+# Plotting BMI vs Life Expectancy
 ggplot(data = life_exp, aes(x = bmi, y = longevity)) +
-  geom_point()
+  geom_point() +
+  labs(title = "Plot of BMI vs Life Expectancy") +
+  ylab("Longevity") +
+  xlab("BMI")
 ```
 
 > BMI and life expectancy has linear relationship and it's positive. There's one obvious outlier.
 
 ```{r}
+# Plotting Total expenditure vs Life Expectancy
 ggplot(data = life_exp, aes(x = tot_exp, y = longevity)) +
-  geom_point()
+  geom_point() +
+  labs(title = "Plot of Total expenditure vs Life Expectancy") +
+  ylab("Longevity") +
+  xlab("Total expenditure")
 ```
 
 > There's no clear linear relationship between total expenditure and life expectancy.
 
 ```{r}
+# Plotting HIV.Aids vs Life Expectancy
 ggplot(data = life_exp, aes(x = aids, y = longevity)) +
-  geom_point()
+  geom_point() +
+  labs(title = "Plot of HIV.Aids vs Life Expectancy") +
+  ylab("Longevity") +
+  xlab("HIV.Aids")
 ```
 
 > The relationship between HIV.AIDS and life expectancy is curve as well. No obvious outlier is found.
 
 ```{r}
-ggplot(data = life_exp, aes(x = aids,y = longevity)) +
-  geom_point()
+# Plotting GDP vs Life Expectancy
+ggplot(data = life_exp, aes(x = gdp,y = longevity)) +
+  geom_point() +
+  labs(title = "Plot of GDP vs Life Expectancy") +
+  ylab("Longevity") +
+  xlab("GDP")
 ```
 
 > The relationship between GDP and life expectancy is curve as well. But there are some outliers.
 
 ```{r}
+# Plotting Thenniess vs Life Expectancy
 ggplot(data = life_exp, aes(x = thin_5_9, y = longevity)) +
-  geom_point()
+  geom_point() +
+  labs(title = "Plot of Thenniess vs Life Expectancy") +
+  ylab("Longevity") +
+  xlab("Thenniess")
 ```
 
 > It seems that thenniess5.9.years and life expectancy has some relationship but not clear, but it should be curve but not linear.
 
 ```{r}
+# Plotting Income.composition.of.resources vs Life Expectancy
 ggplot(data = life_exp, aes(x = inc_comp, y = longevity)) +
-  geom_point()
+  geom_point() +
+  labs(title = "Plot of Income_comp vs Life Expectancy") +
+  ylab("Longevity") +
+  xlab("Income_comp")
 ```
 
 > There is positive linear relationship between income.composition.of.resources and life expectancy. The life line are the outliers.
 
 ```{r}
+# Plotting Schooling vs Life Expectancy
 ggplot(data = life_exp, aes(x = school, y = longevity)) +
-  geom_point()
+  geom_point() +
+  labs(title = "Plot of Schooling vs Life Expectancy") +
+  ylab("Longevity") +
+  xlab("Schooling")
 ```
 
 > There is positive linear relationship between Schooling and life expectancy as well. The life line are still the outliers.
@@ -345,7 +376,7 @@ There are two categorical predictor. Country and Status. 2938 observations in ea
 ```{r}
 
 # plot boxplot of life expectancy across continents
-ggplot(life_exp1,
+ggplot(life_exp,
        aes(x = continent,
            y = longevity,
            fill = continent)) +
@@ -359,5 +390,20 @@ ggplot(life_exp1,
 
 ```
 
+> There appear to be differences in Y across the different levels of X, and there are some plots which are outliers.
 
+```{r}
+ggplot(life_exp,
+       aes(x = status,
+           y = longevity,
+           fill = status)) +
+  geom_boxplot(outlier.color = "black",
+               outlier.shape = 16,
+               outlier.size = 2,
+               notch = FALSE) +
+  labs(title = "Boxplot of Life Expectancy Across Status") +
+  ylab("Longevity") +
+  xlab("Status")
+```
 
+> There appear to be differences in Y across the different levels of X, and there are some outliers in developing countries.
