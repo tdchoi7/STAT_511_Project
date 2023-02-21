@@ -30,6 +30,7 @@ library(tidyverse)
 library(broom)
 library(pastecs)
 library(countrycode)
+library(corrplot)
 
 ```
 
@@ -76,7 +77,7 @@ life_exp <- life_exp %>%
     aids = HIV.AIDS, # deaths per 1000 live births HIV/AIDS (0-4 years)
     gdp = GDP, # GDP per captia in USD
     pop = Population,
-    thin_1_19 = thinness..1.19.years, # % prevalence of thinness among 10 - 19 YO 
+    thin_10_19 = thinness..1.19.years, # % prevalence of thinness among 10 - 19 YO 
     thin_5_9 = thinness.5.9.years, # % prevalence of thinness among 5 - 9 YO 
     inc_comp = Income.composition.of.resources, # Human Development Index - income composition of resources
     school = Schooling # number of years of schooling
@@ -135,27 +136,39 @@ life_exp %>%
 ###### b. Which ones aren’t of substantive interest, and why? For example, there may be some administrative variables (e.g. phone number or website) or others deemed irrelevant to the research question. 
 
 ```{r}
-hist(life_exp$infant.deaths,
-     main="Histogram of Infant Deaths",
-     xlab="Infant Deaths")
+
+# histogram of infant deaths
+hist(life_exp$inf_death,
+     main = "Histogram of Infant Deaths",
+     xlab = "Infant Deaths")
+
 ```
 
 ```{r}
-hist(life_exp$under.five.deaths,
-     main="Histogram of Under 5 Deaths",
-     xlab="Amount of deaths under 5")
+
+# histogram of deaths under 5
+hist(life_exp$u5_deaths,
+     main = "Histogram of Under 5 Deaths",
+     xlab = "Amount of deaths under 5")
+
 ```
 
 ```{r}
-hist(life_exp$thinness..1.19.years,
+
+# histogram of thinness
+hist(life_exp$thin_10_19,
      main = "Histogram of Thinness from age 10 to 19",
      xlab = "Age")
+
 ```
 
 ```{r}
-hist(life_exp$thinness.5.9.years,
+
+# histogram of thinness
+hist(life_exp$thin_5_9,
      main = "Histogram of Thinness from age 5 to 9",
      xlab = "Age")
+
 ```
 
 > There were multiple variables that could of been used to help us answer our research question, but there wasn't much variation in the data or it wasn't relevant enough. Some of the variables that couldn't be of use due to the data provided included infant deaths and under 5 deaths due to their values falling under a single range. For example, in under 5 deaths, the data ranged from 0-2500 and the values were only between 0-250. The thinness variables were ones that didnt seem relevant enough to include because they looked vague.
@@ -187,13 +200,17 @@ per_na_hepb <- (sum_na_hepb / count_rows) * 100
 ###### d. Are there multiple variables that measure very similar things or should be combined into one variable (e.g. a column for both hours and minutes)? Inspecting a correlation matrix of the data is useful here 
 
 ```{r}
-cor.life_exp=cor(life_exp[sapply(life_exp1,is.numeric)])
+
+# plot correlation between columns
+cor.life_exp <- cor(life_exp[sapply(life_exp1, is.numeric)])
 corrplot(cor.life_exp)
+
 ```
 
-> Measles could be combined with infant death and deaths under 5 years. Also infant deaths and deaths under 5 years, since they had the highest corrleation.
+> Based on the correlation plot (in place of a heatmap) there are some variables that are correlated. We observed some columns that do measure similar things or can be combined. Measles is closely related to infant deaths and deaths under 5 years. Also, infant deaths and deaths under 5 years seem related since they had the highest corrleation.
 
 #### 4. Inspect your missing data again and try to gain understanding about what is missing and why.  
+
 ###### a. Read the dataset’s documentation/codebook for insight.
 
 > From the variables we chose to include, hepatitis B, population, and gdp were missing in larger percentages. According to the documentation, lesser known countries provided less data regarding the 3 aformentioned variables.
@@ -222,13 +239,15 @@ sum(str_detect(life_exp$longevity, '[a-zA-Z]')) > 0
 
 ###### c. Provide a brief summary of the missingness 
 
-> There are no 'NAs' or '99s' in our data, but there blank spaces where there should be values.
+> There are no 'NAs' or '99s' in our data, but there are blank spaces where there should be values.
 
 ##### 5. Document what you decide to do about the missingness, and provide the code for filtering out any observations, if applicable.
 
-> We will leave the blank spaces alone. We won't take out any rows or columns because of the information attached to them.
+> We will leave the blank spaces alone. We won't take out any rows or columns because of the information attached to them. If time (and skill) allows, we will either use MICE or KNN to impute values
 
 ##### 6. Document any other data cleaning steps you take, if applicable
+
+> Instead of using countries, we will use continents. The code for that has been provided in lines 55-57
 
 
 ##### 7. Save your cleaned dataset as a .csv or .RDS (use the function write_csv() or write_rds()). Make sure to name it differently from your original dataset (e.g. data_cleaned or data_for_analysis) and save it in your data folder.  
