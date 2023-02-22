@@ -125,10 +125,11 @@ summary(life_exp1$longevity)
 ###### a. Which variables are of substantive interest to your research question?
 
 ```{r}
-life_exp %>%
-  group_by(year) %>%
-  count(year) %>%
-  arrange(desc(n))
+head(
+    life_exp %>%
+      group_by(year) %>%
+        count(year) %>%
+          arrange(desc(n)))
 ```
 
 >  The year 2013, life expectancy, adult mortality, BMI, Alcohol, Hepatitis B, Schooling, Polio, Diphtheria, and Measles. The year 2013 was chosen, since thats where the highest count of rows is. Alcohol, Hepatitis B,  Diphtheria, Measles, Polio were chosen because they are factors that influence health and affect life expectancy. Life expectancy and Adult Mortality help give a big picture of most common ages that both genders are passing away. 
