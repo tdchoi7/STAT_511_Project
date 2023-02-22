@@ -252,8 +252,10 @@ sum(str_detect(life_exp$longevity, '[a-zA-Z]')) > 0
 
 ##### 7. Save your cleaned dataset as a .csv or .RDS (use the function write_csv() or write_rds()). Make sure to name it differently from your original dataset (e.g. data_cleaned or data_for_analysis) and save it in your data folder.  
 ```{r}
+filepath <- "./data/Life Expectancy Data.csv"
+write.csv(life_exp1,filepath)
 
-#
+# Data that was first imported was edited after data cleaning 
 #
 #
 #
