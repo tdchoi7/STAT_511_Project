@@ -124,14 +124,14 @@ summary(life_exp1$longevity)
 #### 3. Narrow down your dataset to a pool of 10 – 20 potential predictor variables. You should document your decisions and justifications. Some things to consider: 
 ###### a. Which variables are of substantive interest to your research question?
 
->  ```{r}
+```{r}
 life_exp %>%
   group_by(year) %>%
   count(year) %>%
   arrange(desc(n))
 ```
 
->  The year(2013), life expectancy, adult mortality, BMI, Alcohol, Hepatitis B, Schooling, Polio, Diphtheria, and Measles. The year 2013 was chosen, since thats where the highest count was. Alcohol, Hepatitis B,  Diphtheria, Measles, Polio were chosen because they are factors that influence health and affect life expectancy. Life expectancy and Adult Mortality help give a big picture of most common ages that both genders are passing away. 
+>  The year 2013, life expectancy, adult mortality, BMI, Alcohol, Hepatitis B, Schooling, Polio, Diphtheria, and Measles. The year 2013 was chosen, since thats where the highest count of rows is. Alcohol, Hepatitis B,  Diphtheria, Measles, Polio were chosen because they are factors that influence health and affect life expectancy. Life expectancy and Adult Mortality help give a big picture of most common ages that both genders are passing away. 
 
 ###### b. Which ones aren’t of substantive interest, and why? For example, there may be some administrative variables (e.g. phone number or website) or others deemed irrelevant to the research question. 
 
@@ -158,7 +158,7 @@ hist(life_exp$u5_deaths,
 # histogram of thinness
 hist(life_exp$thin_10_19,
      main = "Histogram of Thinness from age 10 to 19",
-     xlab = "Age")
+     xlab = "Percentage of Thinness")
 
 ```
 
@@ -167,11 +167,11 @@ hist(life_exp$thin_10_19,
 # histogram of thinness
 hist(life_exp$thin_5_9,
      main = "Histogram of Thinness from age 5 to 9",
-     xlab = "Age")
+     xlab = "Percentage of Thinness")
 
 ```
 
-> There were multiple variables that could of been used to help us answer our research question, but there wasn't much variation in the data or it wasn't relevant enough. Some of the variables that couldn't be of use due to the data provided included infant deaths and under 5 deaths due to their values falling under a single range. For example, in under 5 deaths, the data ranged from 0-2500 and the values were only between 0-250. The thinness variables were ones that didnt seem relevant enough to include because they looked vague.
+> There were multiple variables that could have been used to help us answer our research question, but there was not much variation in the data or it was not relevant enough. Some of the variables that could not be of use due to the data provided included infant deaths and under 5 deaths due to their values falling under a single range. For example, in under 5 deaths, the data ranged from 0-2500 and the values were only between 0-250. The thinness variables were ones that didnt seem relevant enough to include because they looked vague.
 
 
 ###### c. Are there variables that are unusable due to large amounts of missingness?
@@ -247,20 +247,33 @@ sum(str_detect(life_exp$longevity, '[a-zA-Z]')) > 0
 
 ##### 6. Document any other data cleaning steps you take, if applicable
 
-> Instead of using countries, we will use continents. The code for that has been provided in lines 55-57
+> Instead of using countries, we will use continents. The code for the inclusion of continents has been provided in lines 55-57. The country column has not been dropped and will be kept as reference
 
 
 ##### 7. Save your cleaned dataset as a .csv or .RDS (use the function write_csv() or write_rds()). Make sure to name it differently from your original dataset (e.g. data_cleaned or data_for_analysis) and save it in your data folder.  
-```{r}
-filepath <- "./data/Life Expectancy Data.csv"
-write.csv(life_exp1,filepath)
 
-# Data that was first imported was edited after data cleaning 
-#
-#
-#
-#
-#
+```{r}
+
+# save dataframe of data from 2013
+
+life_exp_2013 <- life_exp1[life_exp1$year==2013, ]
+
+dim(life_exp_2013)
+
+```
+
+
+```{r}
+
+# assign filepaths to variables
+filepath_1 <- "./data/Life Expectancy Data Cleaned Version.csv"
+
+filepath_2013 <- "./data/Life Expectancy Data Cleaned Version 2013.csv"
+
+# save to csv
+write_csv(life_exp1, filepath_1)
+
+write_csv(life_exp_2013, filepath_2013)
 
 ```
 
@@ -268,6 +281,9 @@ write.csv(life_exp1,filepath)
 ## Part C
 
 #### 1. First, provide a histogram of your response variable by itself
+
+> We continued using the cleaned unfiltered model 
+
 ```{r}
 
 # plotting histogram of life expectancy 
@@ -314,81 +330,95 @@ ggplot(data = life_exp, aes(x = perc_exp, y = longevity)) +
 > It looks like there is some relationship between percentage expenditure and life expectancy but it's curved instead of linear without outliers.
 
 ```{r}
+
 # Plotting BMI vs Life Expectancy
 ggplot(data = life_exp, aes(x = bmi, y = longevity)) +
   geom_point() +
   labs(title = "Plot of BMI vs Life Expectancy") +
   ylab("Longevity") +
   xlab("BMI")
+
 ```
 
-> BMI and life expectancy has linear relationship and it's positive. There's one obvious outlier.
+> BMI and life expectancy has somewhat of a linear relationship and it's positive. There's one obvious outlier.
 
 ```{r}
+
 # Plotting Total expenditure vs Life Expectancy
 ggplot(data = life_exp, aes(x = tot_exp, y = longevity)) +
   geom_point() +
   labs(title = "Plot of Total expenditure vs Life Expectancy") +
   ylab("Longevity") +
   xlab("Total expenditure")
+
 ```
 
 > There's no clear linear relationship between total expenditure and life expectancy.
 
 ```{r}
+
 # Plotting HIV.Aids vs Life Expectancy
 ggplot(data = life_exp, aes(x = aids, y = longevity)) +
   geom_point() +
   labs(title = "Plot of HIV.Aids vs Life Expectancy") +
   ylab("Longevity") +
   xlab("HIV.Aids")
+
 ```
 
 > The relationship between HIV.AIDS and life expectancy is curve as well. No obvious outlier is found.
 
 ```{r}
+
 # Plotting GDP vs Life Expectancy
 ggplot(data = life_exp, aes(x = gdp,y = longevity)) +
   geom_point() +
   labs(title = "Plot of GDP vs Life Expectancy") +
   ylab("Longevity") +
   xlab("GDP")
+
 ```
 
 > The relationship between GDP and life expectancy is curve as well. But there are some outliers.
 
 ```{r}
+
 # Plotting Thenniess vs Life Expectancy
 ggplot(data = life_exp, aes(x = thin_5_9, y = longevity)) +
   geom_point() +
-  labs(title = "Plot of Thenniess vs Life Expectancy") +
+  labs(title = "Plot of Thinness vs Life Expectancy") +
   ylab("Longevity") +
-  xlab("Thenniess")
+  xlab("Thinness")
+
 ```
 
-> It seems that thenniess5.9.years and life expectancy has some relationship but not clear, but it should be curve but not linear.
+> It seems that thinness5.9.years and life expectancy has some relationship but not clear. Seems like it could be funneling.
 
 ```{r}
+
 # Plotting Income.composition.of.resources vs Life Expectancy
 ggplot(data = life_exp, aes(x = inc_comp, y = longevity)) +
   geom_point() +
   labs(title = "Plot of Income_comp vs Life Expectancy") +
   ylab("Longevity") +
   xlab("Income_comp")
+
 ```
 
-> There is positive linear relationship between income.composition.of.resources and life expectancy. The life line are the outliers.
+> There is positive linear relationship between income.composition.of.resources and life expectancy. There is a line of outliers with x value of 0.
 
 ```{r}
+
 # Plotting Schooling vs Life Expectancy
 ggplot(data = life_exp, aes(x = school, y = longevity)) +
   geom_point() +
   labs(title = "Plot of Schooling vs Life Expectancy") +
   ylab("Longevity") +
   xlab("Schooling")
+
 ```
 
-> There is positive linear relationship between Schooling and life expectancy as well. The life line are still the outliers.
+> There is positive linear relationship between Schooling and life expectancy as well. There is a line of outliers with x value of 0.
 
 #### 3. For each categorical predictor
 
@@ -411,9 +441,11 @@ ggplot(life_exp,
 
 ```
 
-> There appear to be differences in Y across the different levels of X, and there are some plots which are outliers.
+> There appear to be differences in longevity based on continents, and there are some outliers.
 
 ```{r}
+
+# plot boxplot of life expectancy across country status
 ggplot(life_exp,
        aes(x = status,
            y = longevity,
@@ -425,6 +457,7 @@ ggplot(life_exp,
   labs(title = "Boxplot of Life Expectancy Across Status") +
   ylab("Longevity") +
   xlab("Status")
+
 ```
 
-> There appear to be differences in Y across the different levels of X, and there are some outliers in developing countries.
+> There appear to be differences in Life Expectancy based on the country's status, and there are some outliers in developing countries.
