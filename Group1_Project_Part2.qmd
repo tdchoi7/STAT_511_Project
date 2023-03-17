@@ -272,7 +272,7 @@ sum(str_detect(life_exp_2013$longevity, '[a-zA-Z]')) > 0
 # assign filepaths to variables
 filepath_1 <- "./data/longevity Data Cleaned Version.csv"
 
-filepath_2013 <- "./data/longevity Data Cleaned Version 2013.csv"
+filepath_2013 <- "./data/longevity Data Cleaned Version 2013.rds"
 
 # save to csv
 saveRDS(life_exp_2013, filepath_2013)
