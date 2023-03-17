@@ -141,6 +141,9 @@ head(
 
 life_exp_2013 <- life_exp1[life_exp1$year==2013, -2]
 
+# reset dataframe index
+rownames(life_exp_2013) <- 1:nrow(life_exp_2013) 
+
 dim(life_exp_2013)
 
 colnames(life_exp_2013)

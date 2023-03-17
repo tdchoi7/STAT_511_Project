@@ -1,0 +1,96 @@
+---
+title: "Project Part 3"
+subtitle: "STAT 511"
+author: "Moses Sanches, Shuyu Wang, Theodore Choi"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    number_section: false
+    highlight: tango
+---
+
+```{r}
+
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# Project Part 3
+
+
+```{r}
+#| message: false
+# Libraries we used
+library(openintro)
+library(tidyverse)
+library(broom)
+library(pastecs)
+library(countrycode)
+library(corrplot)
+
+```
+
+```{r}
+
+filepath_2013 <- "./data/longevity Data Cleaned Version 2013.rds"
+
+life_exp_2013 <- readRDS(filepath_2013)
+
+life_exp_2013
+
+```
+
+
+# Part A – continuous predictors
+## 1. Produce a scatterplot matrix and the correlation matrix for all continuous predictors and the response variable.
+```{r}
+
+```
+
+#### a. Which variables appear most related to the response?
+>
+
+#### b. Is there the potential of an issue with predictor (x) variables that are highly correlated (which variables)?
+>
+
+## 2. For EACH predictor separately (one at a time), fit the SLR model and note the significance of the predictor.
+```{r}
+
+```
+
+#### a. Using your exploratory analysis in Project Part 2 and the scatterplot you created above, you may choose to transform the x variable now if there is a very strong and clear choice of non-linear function. If so, refit the SLR model with the transformed predictor and note the significance.
+>
+
+# Part B – categorical predictors
+## 1. For EACH categorical predictor separately (one at a time), fit a SLR model
+```{r}
+
+```
+
+#### a. Be sure the categorical variable is stored as a “factor” variable.
+```{r}
+
+```
+
+#### b. Use the overall F-test to note the significance of the variable.
+```{r}
+
+```
+
+#### c. Look at the individual t-tests in the summary output and consider whether some levels of the categorical variable are not “statistically” different from one another. Combining this with the plots and tables you created in Project Part 2, are there categories you might “collapse” (combine)? The decision to combine could also be impacted by the amount of data in the categories. If there are many categories determine which categories to collapse at this stage (consider whether the categories make sense to combine too!). If not many categories, just make note of the possible need to collapse later in the model building process.
+>
+
+# Part C – Preliminary summary
+## Provide a brief (1 paragraph) summary of your findings so far. Some things to comment on:
+#### • What variables appear to be associated with your outcome of interest?
+>
+
+#### • Do you anticipate using any non-linear terms for any of these predictors (i.e. did you employ any x transformations)?
+>
+
+#### • Are there any of your predictor variables that you think might interact with one another? Note – this is not a statistical question but rather asks you to reflect on the substantive knowledge/intuition you have about the context of your data and research question.
+>
