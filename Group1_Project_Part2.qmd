@@ -78,7 +78,7 @@ life_exp <- life_exp %>%
     aids = HIV.AIDS, # deaths per 1000 live births HIV/AIDS (0-4 years)
     gdp = GDP, # GDP per captia in USD
     pop = Population,
-    thin_10_19 = thinness..1.19.years, # % prevalence of thinness among 10 - 19 YO 
+    thin_1_19 = thinness..1.19.years, # % prevalence of thinness among 10 - 19 YO 
     thin_5_9 = thinness.5.9.years, # % prevalence of thinness among 5 - 9 YO 
     inc_comp = Income.composition.of.resources, # Human Development Index - income composition of resources
     school = Schooling # number of years of schooling
@@ -173,7 +173,7 @@ hist(life_exp_2013$u5_deaths,
 ```{r}
 
 # histogram of thinness
-hist(life_exp_2013$thin_10_19,
+hist(life_exp_2013$thin_1_19,
      main = "Histogram of Thinness from age 10 to 19",
      xlab = "Percentage of Thinness")
 

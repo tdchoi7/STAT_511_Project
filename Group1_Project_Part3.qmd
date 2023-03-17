@@ -31,16 +31,21 @@ library(broom)
 library(pastecs)
 library(countrycode)
 library(corrplot)
+library(plotly)
+library(GGally)
+library(glue)
 
 ```
 
 ```{r}
 
+# import data
 filepath_2013 <- "./data/longevity Data Cleaned Version 2013.rds"
 
 life_exp_2013 <- readRDS(filepath_2013)
 
-life_exp_2013
+# show the top rows of the dataframe
+head(life_exp_2013)
 
 ```
 
@@ -49,16 +54,46 @@ life_exp_2013
 ## 1. Produce a scatterplot matrix and the correlation matrix for all continuous predictors and the response variable.
 ```{r}
 
+# # Scatterplot matrix of the data
+# pairs(life_exp_2013, lower.panel = NULL)
+# 
+# # correlation matrix of the data
+# corr_matrix <- ggpairs(life_exp_2013[sapply(life_exp_2013, is.numeric)]) +
+#                   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+# 
+# # ggplotly(corr_matrix) 
+# 
+# corr_matrix
+
 ```
 
 #### a. Which variables appear most related to the response?
->
+> From what is visible without zooming in, it seems that Income Composition of Resources and Schooling are most related to the response
 
 #### b. Is there the potential of an issue with predictor (x) variables that are highly correlated (which variables)?
->
+> Thinness of Ages 1 to 19 and Thinness of Ages 5 to 9 seem to be quite correlated. Income Composition of Resources and Schooling also seem to be correlated. Infant Death and Under Age 5 Deaths are also highly correlated. Percent Expenditure on Health as a Percentage of GDP and GDP also seem highly correlated. HIV AIDS and Adult Mortality are also correlated. 
 
 ## 2. For EACH predictor separately (one at a time), fit the SLR model and note the significance of the predictor.
 ```{r}
+names(life_exp_2013[sapply(life_exp_2013, is.numeric)])
+```
+
+
+```{r}
+
+# Get column names of numeric response variables
+colnames_lifeexp <- names(life_exp_2013[sapply(life_exp_2013, is.numeric)])[-1]
+
+# Loop to get scatterplots of the response variable against each numerical predictor variable
+for (col_name in dput(colnames_lifeexp))
+  {
+  plt <- ggplot(data = life_exp_2013, aes_string(x = col_name, y = 'longevity')) +
+          geom_point() +
+          labs(title = glue('Plot of longevity vs {col_name}')) +
+          ylab('Longevity') +
+          xlab(col_name)
+  print(plt)
+  }
 
 ```
 
