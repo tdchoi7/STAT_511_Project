@@ -30,10 +30,12 @@ library(tidyverse)
 library(broom)
 library(pastecs)
 library(countrycode)
+library(ggplot2)
 library(corrplot)
 library(plotly)
 library(GGally)
 library(glue)
+library(ggpubr)
 
 ```
 
@@ -67,7 +69,7 @@ corr_matrix <- ggpairs(life_exp_2013[sapply(life_exp_2013, is.numeric)],
 # # Commented out lines below due to too many notifications
 # ggplotly(corr_matrix) 
 # 
-# corr_matrix
+corr_matrix
 
 ```
 
@@ -75,7 +77,7 @@ corr_matrix <- ggpairs(life_exp_2013[sapply(life_exp_2013, is.numeric)],
 > From what is visible without zooming in, it seems that Income Composition of Resources and Schooling are most related to the response
 
 #### b. Is there the potential of an issue with predictor (x) variables that are highly correlated (which variables)?
-> Thinness of Ages 1 to 19 and Thinness of Ages 5 to 9 seem to be quite correlated. Income Composition of Resources and Schooling also seem to be correlated. Infant Death and Under Age 5 Deaths are also highly correlated. Percent Expenditure on Health as a Percentage of GDP and GDP also seem highly correlated. HIV AIDS and Adult Mortality are also correlated. 
+> Thinness of Ages 1 to 19 and Thinness of Ages 5 to 9 seem to be quite correlated. Income Composition of Resources and Schooling also seem to be correlated. Infant Death and Under Age 5 Deaths are also highly correlated. Percent Expenditure on Health as a Percentage of GDP and GDP also seem highly correlated. HIV AIDS and Adult Mortality are also correlated
 
 ## 2. For EACH predictor separately (one at a time), fit the SLR model and note the significance of the predictor.
 ```{r}
@@ -109,7 +111,6 @@ for (i in my_range)
 ```
 > It seems that most of the SLR models comparing the response to the numerical predictors produce a small p value. The only column that did not have a low p values is the population column
 
-
 #### a. Using your exploratory analysis in Project Part 2 and the scatterplot you created above, you may choose to transform the x variable now if there is a very strong and clear choice of non-linear function. If so, refit the SLR model with the transformed predictor and note the significance.
 ```{r}
 
@@ -119,43 +120,43 @@ for (i in my_range)
 # Part B – categorical predictors
 ## 1. For EACH categorical predictor separately (one at a time), fit a SLR model
 ```{r}
-Country.graph<-ggplot(life_exp_2013, aes(x=Country, y=))+
+continent.graph<-ggplot(life_exp_2013, aes(x=continent, y=longevity))+
                      geom_point()
 
-Country.graph <- Country.graph + geom_smooth(method="lm", col="black")
+continent.graph <- continent.graph + geom_smooth(method="lm", col="black")
 
-Country.graph <- Country.graph +
+continent.graph <- continent.graph +
   stat_regline_equation(label.x = 3, label.y = 7)
   
-Country.graph +
+continent.graph +
   theme_bw() +
-  labs(title = "Life Expectancy by Country",
-      x = "Country",
+  labs(title = "Life Expectancy by continent",
+      x = "Continent",
       y = " ")
       
-Country.graph
+continent.graph
 ```
 
 ```{r}
-Year.graph<-ggplot(life_exp_2013, aes(x=Country, y=))+
+year.graph<-ggplot(life_exp_2013, aes(x=continent, y=longevity))+
                      geom_point()
 
-Year.graph <- Year.graph + geom_smooth(method="lm", col="black")
+year.graph <- year.graph + geom_smooth(method="lm", col="black")
 
-Year.graph <- Year.graph +
+year.graph <- year.graph +
   stat_regline_equation(label.x = 3, label.y = 7)
   
- Year.graph +
+ year.graph +
   theme_bw() +
-  labs(title = "Life Expectancy by Country",
-      x = "Year",
+  labs(title = "Life Expectancy by continent",
+      x = "year",
       y = " ")
       
-Year.graph
+year.graph
 ```
 
 ```{r}
-Status.graph<-ggplot(life_exp_2013, aes(x=Country, y=))+
+Status.graph<-ggplot(life_exp_2013, aes(x=continent, y=longevity))+
                      geom_point()
 
 Status.graph <- Status.graph + geom_smooth(method="lm", col="black")
@@ -165,7 +166,7 @@ Status.graph <- Status.graph +
   
  Status.graph +
   theme_bw() +
-  labs(title = "Life Expectancy by Country",
+  labs(title = "Life Expectancy by continent",
       x = "Status",
       y = " ")
       
