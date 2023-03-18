@@ -54,20 +54,20 @@ head(life_exp_2013)
 ## 1. Produce a scatterplot matrix and the correlation matrix for all continuous predictors and the response variable.
 ```{r}
 
-# # Scatterplot matrix of the data
-# pairs(life_exp_2013, 
-#       upper.panel = NULL, 
-#       diag_panel = panel.hist, 
-#       labels = names(life_exp_2013[sapply(life_exp_2013, is.numeric)]))
+# Scatterplot matrix of the data
+pairs(life_exp_2013[sapply(life_exp_2013, is.numeric)],
+      upper.panel = NULL,
+      labels = names(life_exp_2013[sapply(life_exp_2013, is.numeric)]))
 # 
 # # correlation matrix of the data
 corr_matrix <- ggpairs(life_exp_2013[sapply(life_exp_2013, is.numeric)],
                        upper = list(continuous = wrap('cor', size = 4)),) +
                        theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# # Commented out lines below due to too many notifications
+# ggplotly(corr_matrix) 
 # 
-# # ggplotly(corr_matrix) 
-# 
-corr_matrix
+# corr_matrix
 
 ```
 
@@ -79,29 +79,41 @@ corr_matrix
 
 ## 2. For EACH predictor separately (one at a time), fit the SLR model and note the significance of the predictor.
 ```{r}
-names(life_exp_2013[sapply(life_exp_2013, is.numeric)])
-```
 
-
-```{r}
-
-# Get column names of numeric response variables
+# assign column names to variable
 colnames_lifeexp <- names(life_exp_2013[sapply(life_exp_2013, is.numeric)])[-1]
 
-# Loop to get scatterplots of the response variable against each numerical predictor variable
-for (col_name in dput(colnames_lifeexp))
+
+
+# credit to: https://stackoverflow.com/questions/59161144/creating-a-loop-through-a-list-of-variables-for-an-lm-model-in-r
+# assign list of models to variable
+list_formulas <- lapply(paste("longevity ~", colnames_lifeexp), as.formula)
+
+# apply linear model function to the list of variables
+list_lm_life_exp <- lapply(list_formulas, function(x) lm(x, data = life_exp_2013))
+
+# assigning the summaries of the linear model iterable as an iterable to a variable
+list_lm_life_exp_summ <- lapply(list_lm_life_exp, summary)
+
+
+
+# creating a range for iteration
+my_range <- 1:length(colnames_lifeexp)
+
+# outputting p value
+for (i in my_range)
   {
-  plt <- ggplot(data = life_exp_2013, aes_string(x = col_name, y = 'longevity')) +
-          geom_point() +
-          labs(title = glue('Plot of longevity vs {col_name}')) +
-          ylab('Longevity') +
-          xlab(col_name)
-  print(plt)
+  print(glue('The p value for longevity vs {colnames_lifeexp[i]} is {tidy(list_lm_life_exp_summ[[i]])[2,5]}'))
   }
 
 ```
+> It seems that most of the SLR models comparing the response to the numerical predictors produce a small p value. The only column that did not have a low p values is the population column
+
 
 #### a. Using your exploratory analysis in Project Part 2 and the scatterplot you created above, you may choose to transform the x variable now if there is a very strong and clear choice of non-linear function. If so, refit the SLR model with the transformed predictor and note the significance.
+```{r}
+
+```
 >
 
 # Part B – categorical predictors
