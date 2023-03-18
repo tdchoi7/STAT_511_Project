@@ -119,7 +119,57 @@ for (i in my_range)
 # Part B – categorical predictors
 ## 1. For EACH categorical predictor separately (one at a time), fit a SLR model
 ```{r}
+Country.graph<-ggplot(life_exp_2013, aes(x=Country, y=))+
+                     geom_point()
 
+Country.graph <- Country.graph + geom_smooth(method="lm", col="black")
+
+Country.graph <- Country.graph +
+  stat_regline_equation(label.x = 3, label.y = 7)
+  
+Country.graph +
+  theme_bw() +
+  labs(title = "Life Expectancy by Country",
+      x = "Country",
+      y = " ")
+      
+Country.graph
+```
+
+```{r}
+Year.graph<-ggplot(life_exp_2013, aes(x=Country, y=))+
+                     geom_point()
+
+Year.graph <- Year.graph + geom_smooth(method="lm", col="black")
+
+Year.graph <- Year.graph +
+  stat_regline_equation(label.x = 3, label.y = 7)
+  
+ Year.graph +
+  theme_bw() +
+  labs(title = "Life Expectancy by Country",
+      x = "Year",
+      y = " ")
+      
+Year.graph
+```
+
+```{r}
+Status.graph<-ggplot(life_exp_2013, aes(x=Country, y=))+
+                     geom_point()
+
+Status.graph <- Status.graph + geom_smooth(method="lm", col="black")
+
+Status.graph <- Status.graph +
+  stat_regline_equation(label.x = 3, label.y = 7)
+  
+ Status.graph +
+  theme_bw() +
+  labs(title = "Life Expectancy by Country",
+      x = "Status",
+      y = " ")
+      
+Status.graph
 ```
 
 #### a. Be sure the categorical variable is stored as a “factor” variable.
