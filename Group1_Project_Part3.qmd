@@ -19,9 +19,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```
 
-# Project Part 3
-
-
 ```{r}
 #| message: false
 # Libraries we used
@@ -52,8 +49,8 @@ head(life_exp_2013)
 ```
 
 
-# Part A – continuous predictors
-## 1. Produce a scatterplot matrix and the correlation matrix for all continuous predictors and the response variable.
+## Part A – continuous predictors
+### 1. Produce a scatterplot matrix and the correlation matrix for all continuous predictors and the response variable.
 ```{r}
 
 # Scatterplot matrix of the data
@@ -66,20 +63,46 @@ corr_matrix <- ggpairs(life_exp_2013[sapply(life_exp_2013, is.numeric)],
                        upper = list(continuous = wrap('cor', size = 4)),) +
                        theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-# # Commented out lines below due to too many notifications
+# # Commented out lines below due to too many notifications and lag
 # ggplotly(corr_matrix) 
 # 
-corr_matrix
+# corr_matrix
 
 ```
 
-#### a. Which variables appear most related to the response?
+##### a. Which variables appear most related to the response?
 > From what is visible without zooming in, it seems that Income Composition of Resources and Schooling are most related to the response
 
-#### b. Is there the potential of an issue with predictor (x) variables that are highly correlated (which variables)?
+##### b. Is there the potential of an issue with predictor (x) variables that are highly correlated (which variables)?
 > Thinness of Ages 1 to 19 and Thinness of Ages 5 to 9 seem to be quite correlated. Income Composition of Resources and Schooling also seem to be correlated. Infant Death and Under Age 5 Deaths are also highly correlated. Percent Expenditure on Health as a Percentage of GDP and GDP also seem highly correlated. HIV AIDS and Adult Mortality are also correlated
 
-## 2. For EACH predictor separately (one at a time), fit the SLR model and note the significance of the predictor.
+### 2. For EACH predictor separately (one at a time), fit the SLR model and note the significance of the predictor.
+
+```{r}
+# assign column names to variable
+colnames_lifeexp <- names(life_exp_2013[sapply(life_exp_2013, is.numeric)])[-1]
+
+
+
+# credit to: https://stackoverflow.com/questions/59161144/creating-a-loop-through-a-list-of-variables-for-an-lm-model-in-r
+# assign list of models to variable
+list_formulas <- lapply(paste("longevity ~", colnames_lifeexp), as.formula)
+
+# apply linear model function to the list of variables
+list_lm_life_exp <- lapply(list_formulas, function(x) lm(x, data = life_exp_2013))
+
+# apply augment function to the list of linear models
+list_aug_life_exp <- lapply(list_lm_life_exp, function(x) augment(x))
+
+# assigning the summaries of the linear model iterable as an iterable to a variable
+list_lm_life_exp_summ <- lapply(list_lm_life_exp, summary)
+
+list_aug_life_exp[[1]]
+```
+
+
+
+
 ```{r}
 
 # assign column names to variable
@@ -94,6 +117,9 @@ list_formulas <- lapply(paste("longevity ~", colnames_lifeexp), as.formula)
 # apply linear model function to the list of variables
 list_lm_life_exp <- lapply(list_formulas, function(x) lm(x, data = life_exp_2013))
 
+# apply augment function to the list of linear models
+list_aug_life_exp <- lapply(list_lm_life_exp, function(x) augment(x))
+
 # assigning the summaries of the linear model iterable as an iterable to a variable
 list_lm_life_exp_summ <- lapply(list_lm_life_exp, summary)
 
@@ -105,21 +131,55 @@ my_range <- 1:length(colnames_lifeexp)
 # outputting p value
 for (i in my_range)
   {
+  # get the p value of the independent variable
   print(glue('The p value for longevity vs {colnames_lifeexp[i]} is {tidy(list_lm_life_exp_summ[[i]])[2,5]}'))
+  
+  # plot the augments to determine if linear
+  plot <- ggplot(list_aug_life_exp[[i]], aes(x = .fitted, y = .resid)) +
+            geom_point() +
+            labs(title = glue("Longevity by {colnames_lifeexp[i]}"),
+              x = {colnames_lifeexp[i]},
+              y = ".resid") +
+            theme_minimal()
+  
+  print(plot)
+  
   }
 
 ```
 > It seems that most of the SLR models comparing the response to the numerical predictors produce a small p value. The only column that did not have a low p values is the population column
 
-#### a. Using your exploratory analysis in Project Part 2 and the scatterplot you created above, you may choose to transform the x variable now if there is a very strong and clear choice of non-linear function. If so, refit the SLR model with the transformed predictor and note the significance.
+##### a. Using your exploratory analysis in Project Part 2 and the scatterplot you created above, you may choose to transform the x variable now if there is a very strong and clear choice of non-linear function. If so, refit the SLR model with the transformed predictor and note the significance.
+> There seems to be fanning in:
+> - adult_mort
+> - inf_death
+> - measles
+> - u5_deaths
+> - aids
+> - pop
+> - thin_1_19
+> - thin_5_9
+
+> There seems to be funneling in:
+> - gdp
+
+> There seems to be a n shape in:
+> - perc_exp
+
+> There seems to be a u shape in:
+> - polio
+> - dipth
+> - 
+
 ```{r}
 
 ```
 >
 
-# Part B – categorical predictors
-## 1. For EACH categorical predictor separately (one at a time), fit a SLR model
+## Part B – categorical predictors
+### 1. For EACH categorical predictor separately (one at a time), fit a SLR model
 ```{r}
+
 continent.graph<-ggplot(life_exp_2013, aes(x=continent, y=longevity))+
                      geom_point()
 
@@ -130,14 +190,13 @@ continent.graph <- continent.graph +
   
 continent.graph +
   theme_bw() +
-  labs(title = "Life Expectancy by continent",
+  labs(title = "Longevity by continent",
       x = "Continent",
-      y = " ")
+      y = "Longevity")
       
-continent.graph
-```
+# continent.graph
 
-```{r}
+
 year.graph<-ggplot(life_exp_2013, aes(x=continent, y=longevity))+
                      geom_point()
 
@@ -148,14 +207,13 @@ year.graph <- year.graph +
   
  year.graph +
   theme_bw() +
-  labs(title = "Life Expectancy by continent",
+  labs(title = "Longevity by continent",
       x = "year",
-      y = " ")
+      y = "Longevity")
       
-year.graph
-```
+# year.graph
 
-```{r}
+ 
 Status.graph<-ggplot(life_exp_2013, aes(x=continent, y=longevity))+
                      geom_point()
 
@@ -166,33 +224,35 @@ Status.graph <- Status.graph +
   
  Status.graph +
   theme_bw() +
-  labs(title = "Life Expectancy by continent",
+  labs(title = "Longevity by continent",
       x = "Status",
-      y = " ")
+      y = "Longevity")
       
-Status.graph
+# Status.graph.
+
 ```
 
-#### a. Be sure the categorical variable is stored as a “factor” variable.
+##### a. Be sure the categorical variable is stored as a “factor” variable.
 ```{r}
 
 ```
 
-#### b. Use the overall F-test to note the significance of the variable.
+##### b. Use the overall F-test to note the significance of the variable.
 ```{r}
 
 ```
 
-#### c. Look at the individual t-tests in the summary output and consider whether some levels of the categorical variable are not “statistically” different from one another. Combining this with the plots and tables you created in Project Part 2, are there categories you might “collapse” (combine)? The decision to combine could also be impacted by the amount of data in the categories. If there are many categories determine which categories to collapse at this stage (consider whether the categories make sense to combine too!). If not many categories, just make note of the possible need to collapse later in the model building process.
+##### c. Look at the individual t-tests in the summary output and consider whether some levels of the categorical variable are not “statistically” different from one another. Combining this with the plots and tables you created in Project Part 2, are there categories you might “collapse” (combine)? The decision to combine could also be impacted by the amount of data in the categories. If there are many categories determine which categories to collapse at this stage (consider whether the categories make sense to combine too!). If not many categories, just make note of the possible need to collapse later in the model building process.
 >
 
+<<<<<<< Updated upstream
 # Part C – Preliminary summary
 ## Provide a brief (1 paragraph) summary of your findings so far. Some things to comment on:
 #### • What variables appear to be associated with your outcome of interest?
->Some of the variables are associated with our outcome of interest and some of them are not. According to our scatterplot graphs in part 1 and part 2, Percentage Expenditure, BMI, HIV.Aids, GDP, thinness5.9.years, Income.composition.of.resources, and Schooling appear to be associated with our outcome of interest. However, some of them are linearly associated with thee outcome, some of them are curvely associated, and some of them seems to be associated but hard to see any clear model. For example, BMI, Income, and Schooling are having linear relationship; Percentage Expenditure, HIV, and GDP are having curve relationship; thinness is the one that's not clear.
+> Some of the variables are associated with our outcome of interest and some of them are not. According to our scatterplot graphs in part 1 and part 2, Percentage Expenditure, BMI, HIV.Aids, GDP, thinness5.9.years, Income.composition.of.resources, and Schooling appear to be associated with our outcome of interest. However, some of them are linearly associated with thee outcome, some of them are curvely associated, and some of them seems to be associated but hard to see any clear model. For example, BMI, Income, and Schooling are having linear relationship; Percentage Expenditure, HIV, and GDP are having curve relationship; thinness is the one that's not clear.
 
 #### • Do you anticipate using any non-linear terms for any of these predictors (i.e. did you employ any x transformations)?
->We are probably going to use non-linear terms for Percentage Expenditure, HIV, and GDP since they are not showing linear relationship with life expectancy right now.
+> We are probably going to use non-linear terms for Percentage Expenditure, HIV, and GDP since they are not showing linear relationship with Longevity right now.
 
 #### • Are there any of your predictor variables that you think might interact with one another? Note – this is not a statistical question but rather asks you to reflect on the substantive knowledge/intuition you have about the context of your data and research question.
->We do think that some of our predictor variables might interact with one other, and actually we have already discovered some of this kind of relationship. For example in part B in project part 2, we found that Measles is closely related to infant deaths and deaths under 5 years. And based on the current situation of our society, I think some of the predictors is going to affect each other such as percentage expenditure and income, income and GDP, Schooling and GDP, etc.
+> We do think that some of our predictor variables might interact with one other, and actually we have already discovered some of this kind of relationship. For example in part B in project part 2, we found that Measles is closely related to infant deaths and deaths under 5 years. And based on the current situation of our society, I think some of the predictors is going to affect each other such as percentage expenditure and income, income and GDP, Schooling and GDP, etc.
