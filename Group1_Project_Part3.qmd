@@ -126,10 +126,10 @@ for (col_name in dput(colnames_lifeexp))
 # Part C – Preliminary summary
 ## Provide a brief (1 paragraph) summary of your findings so far. Some things to comment on:
 #### • What variables appear to be associated with your outcome of interest?
->
+>Some of the variables are associated with our outcome of interest and some of them are not. According to our scatterplot graphs in part 1 and part 2, Percentage Expenditure, BMI, HIV.Aids, GDP, thinness5.9.years, Income.composition.of.resources, and Schooling appear to be associated with our outcome of interest. However, some of them are linearly associated with thee outcome, some of them are curvely associated, and some of them seems to be associated but hard to see any clear model. For example, BMI, Income, and Schooling are having linear relationship; Percentage Expenditure, HIV, and GDP are having curve relationship; thinness is the one that's not clear.
 
 #### • Do you anticipate using any non-linear terms for any of these predictors (i.e. did you employ any x transformations)?
->
+>We are probably going to use non-linear terms for Percentage Expenditure, HIV, and GDP since they are not showing linear relationship with life expectancy right now.
 
 #### • Are there any of your predictor variables that you think might interact with one another? Note – this is not a statistical question but rather asks you to reflect on the substantive knowledge/intuition you have about the context of your data and research question.
->
+>We do think that some of our predictor variables might interact with one other, and actually we have already discovered some of this kind of relationship. For example in part B in project part 2, we found that Measles is closely related to infant deaths and deaths under 5 years. And based on the current situation of our society, I think some of the predictors is going to affect each other such as percentage expenditure and income, income and GDP, Schooling and GDP, etc.
