@@ -55,15 +55,19 @@ head(life_exp_2013)
 ```{r}
 
 # # Scatterplot matrix of the data
-# pairs(life_exp_2013, lower.panel = NULL)
+# pairs(life_exp_2013, 
+#       upper.panel = NULL, 
+#       diag_panel = panel.hist, 
+#       labels = names(life_exp_2013[sapply(life_exp_2013, is.numeric)]))
 # 
 # # correlation matrix of the data
-# corr_matrix <- ggpairs(life_exp_2013[sapply(life_exp_2013, is.numeric)]) +
-#                   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+corr_matrix <- ggpairs(life_exp_2013[sapply(life_exp_2013, is.numeric)],
+                       upper = list(continuous = wrap('cor', size = 4)),) +
+                       theme(axis.text.x = element_text(angle = 90, hjust = 1))
 # 
 # # ggplotly(corr_matrix) 
 # 
-# corr_matrix
+corr_matrix
 
 ```
 
