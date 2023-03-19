@@ -12,7 +12,6 @@ output:
 ---
 
 ```{r}
-
 #| label: setup
 #| include: false
 knitr::opts_chunk$set(echo = TRUE)
@@ -57,15 +56,15 @@ head(life_exp_2013)
 pairs(life_exp_2013[sapply(life_exp_2013, is.numeric)],
       upper.panel = NULL,
       labels = names(life_exp_2013[sapply(life_exp_2013, is.numeric)]))
-# 
-# # correlation matrix of the data
+
+# correlation matrix of the data
 corr_matrix <- ggpairs(life_exp_2013[sapply(life_exp_2013, is.numeric)],
                        upper = list(continuous = wrap('cor', size = 4)),) +
                        theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 # # Commented out lines below due to too many notifications and lag
 # ggplotly(corr_matrix) 
-# 
+
 # corr_matrix
 
 ```
@@ -146,6 +145,8 @@ for (i in my_range)
 > - 
 
 ```{r}
+
+
 
 ```
 >
