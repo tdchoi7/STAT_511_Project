@@ -32,6 +32,9 @@ library(plotly)
 library(GGally)
 library(glue)
 library(ggpubr)
+library(olsrr)
+library(MASS)
+library(cowplot)
 
 ```
 
@@ -50,6 +53,7 @@ head(life_exp_2013)
 
 ## Part A – continuous predictors
 ### 1. Produce a scatterplot matrix and the correlation matrix for all continuous predictors and the response variable.
+
 ```{r}
 
 # Scatterplot matrix of the data
@@ -59,29 +63,32 @@ pairs(life_exp_2013[sapply(life_exp_2013, is.numeric)],
 
 # correlation matrix of the data
 corr_matrix <- ggpairs(life_exp_2013[sapply(life_exp_2013, is.numeric)],
-                       upper = list(continuous = wrap('cor', size = 4)),) +
+                       upper = list(continuous = wrap('cor', size = 1))) + 
                        theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 # # Commented out lines below due to too many notifications and lag
 # ggplotly(corr_matrix) 
 
-# corr_matrix
+# print(corr_matrix)
 
 ```
 
 ##### a. Which variables appear most related to the response?
-> From what is visible without zooming in, it seems that Income Composition of Resources and Schooling are most related to the response
+> It seems that Income Composition of Resources (Corr: 0.891) and Schooling (Corr: 0.795) are most related to the response. Adult Mortality (Corr: -0.723) and HIV AIDS (Corr: -0.622) also seem to be related to the response
 
 ##### b. Is there the potential of an issue with predictor (x) variables that are highly correlated (which variables)?
-> Thinness of Ages 1 to 19 and Thinness of Ages 5 to 9 seem to be quite correlated. Income Composition of Resources and Schooling also seem to be correlated. Infant Death and Under Age 5 Deaths are also highly correlated. Percent Expenditure on Health as a Percentage of GDP and GDP also seem highly correlated. HIV AIDS and Adult Mortality are also correlated
+> There are many variables that are correlated. Some to note are described in the following blurb:
+
+>Thinness of Ages 1 to 19 and Thinness of Ages 5 to 9 seem to be quite correlated/possibly colinear (Corr: 0.925). Income Composition of Resources and Schooling also seem to be correlated/possibly colinear (Corr: 0.913). Infant Death and Under Age 5 Deaths are also highly correlated/possibly colinear (Corr: 0.997). Percent Expenditure on Health as a Percentage of GDP and GDP also seem highly correlated/possibly colinear (Corr: 0.918).
+
 
 ### 2. For EACH predictor separately (one at a time), fit the SLR model and note the significance of the predictor.
 ```{r}
-
 # assign column names to variable
 colnames_lifeexp <- names(life_exp_2013[sapply(life_exp_2013, is.numeric)])[-1]
 
 
+# Getting the summaries of the SLR models as an iterable:
 
 # credit to: https://stackoverflow.com/questions/59161144/creating-a-loop-through-a-list-of-variables-for-an-lm-model-in-r
 # assign list of models to variable
@@ -96,33 +103,46 @@ list_aug_life_exp <- lapply(list_lm_life_exp, function(x) augment(x))
 # assigning the summaries of the linear model iterable as an iterable to a variable
 list_lm_life_exp_summ <- lapply(list_lm_life_exp, summary)
 
-
-
 # creating a range for iteration
 my_range <- 1:length(colnames_lifeexp)
 
-# outputting p value
+# outputting relevant plots
 for (i in my_range)
   {
   # get the p value of the independent variable
   print(glue('The p value for longevity vs {colnames_lifeexp[i]} is {tidy(list_lm_life_exp_summ[[i]])[2,5]}'))
   
-  # plot the augments to determine if linear
-  plot <- ggplot(list_aug_life_exp[[i]], aes(x = .fitted, y = .resid)) +
-            geom_point() +
-            labs(title = glue("Longevity by {colnames_lifeexp[i]}"),
-              x = {colnames_lifeexp[i]},
-              y = ".resid") +
-            theme_minimal()
+  # get the p value of the independent variable
+  print(glue('Plots to determine linear assumptions of {colnames_lifeexp[i]}'))
   
-  print(plot)
+  p1 <- ggplot(data = list_aug_life_exp[[i]],
+               aes(y = .resid,
+                   x = .fitted)) +
+        geom_point()
   
+  p2 <- ggplot(data = list_aug_life_exp[[i]],
+               aes(sample = .resid)) +    
+        geom_qq_line() +
+        geom_qq() +
+        theme_minimal()
+  
+  p3 <- ggplot(data = list_aug_life_exp[[i]], aes(x = .resid)) +    
+        geom_boxplot() + 
+        theme_minimal()
+  
+  print(plot_grid(p1, p2, p3, nrow = 2))
   }
 
 ```
+
+
 > It seems that most of the SLR models comparing the response to the numerical predictors produce a small p value. The only column that did not have a low p values is the population column
 
 ##### a. Using your exploratory analysis in Project Part 2 and the scatterplot you created above, you may choose to transform the x variable now if there is a very strong and clear choice of non-linear function. If so, refit the SLR model with the transformed predictor and note the significance.
+
+
+
+
 > There seems to be fanning in:
 > - adult_mort
 > - inf_death
@@ -145,10 +165,143 @@ for (i in my_range)
 > - 
 
 ```{r}
-
-
+# check normality and F test of fit for adult mortality
+# 
+# adult_mort_lm_initial <- lm(longevity ~ adult_mort, life_exp_2013)
+# 
+# boxcox(adult_mort_lm_initial)
+# 
+# life_exp_2013 <- life_exp_2013 %>%
+#                   mutate(longevity_bc_adult_mort = adult_mort^(15))
+# 
+# adult_mort_lm <- lm(longevity_bc_adult_mort ~ adult_mort, life_exp_2013)
+# 
+# adult_mort_lm_aug <- augment(adult_mort_lm)
+# 
+# ggplot(adult_mort_lm_aug, aes(x = .fitted, y = .resid)) +
+#             geom_point() +
+#             labs(title = 'Residuals vs Adult Mortality Transformed',
+#               x = "Adult Mortality Transformed",
+#               y = ".resid") +
+#             theme_minimal()
+# 
+# shapiro.test(adult_mort_lm$residuals)
+# 
+# ols_pure_error_anova(adult_mort_lm)
 
 ```
+
+```{r}
+# 
+# inf_death_lm_initial <- lm(longevity ~ inf_death, life_exp_2013)
+# 
+# boxcox(inf_death_lm_initial)
+# 
+# life_exp_2013 <- life_exp_2013 %>%
+#                   mutate(longevity_bc_inf_death = inf_death^(4))
+# 
+# inf_death_lm <- lm(longevity_bc_inf_death ~ inf_death, life_exp_2013)
+# 
+# inf_death_lm_aug <- augment(inf_death_lm)
+# 
+# ggplot(inf_death_lm_aug, aes(x = .fitted, y = .resid)) +
+#             geom_point() +
+#             labs(title = 'Residuals vs Adult Mortality Transformed',
+#               x = "Adult Mortality Transformed",
+#               y = ".resid") +
+#             theme_minimal()
+# 
+# shapiro.test(inf_death_lm$residuals)
+# 
+# ols_pure_error_anova(inf_death_lm)
+
+```
+
+```{r}
+
+# perc_exp_lm_initial <- lm(longevity ~ perc_exp, life_exp_2013)
+# 
+# boxcox(perc_exp_lm_initial)
+# 
+# life_exp_2013 <- life_exp_2013 %>%
+#                   mutate(longevity_bc_perc_exp = perc_exp^(10))
+# 
+# perc_exp_lm <- lm(longevity_bc_perc_exp ~ perc_exp, life_exp_2013[complete.cases(life_exp_2013),])
+# 
+# perc_exp_lm_aug <- augment(perc_exp_lm)
+# 
+# ggplot(perc_exp_lm_aug, aes(x = .fitted, y = .resid)) +
+#             geom_point() +
+#             labs(title = 'Residuals vs Adult Mortality Transformed',
+#               x = "Adult Mortality Transformed",
+#               y = ".resid") +
+#             theme_minimal()
+# 
+# shapiro.test(perc_exp_lm$residuals)
+# 
+# ols_pure_error_anova(perc_exp_lm)
+
+```
+
+```{r}
+
+# pop_lm_initial <- lm(longevity ~ pop, life_exp_2013)
+# 
+# boxcox(pop_lm_initial)
+# 
+# 
+# life_exp_2013 <- life_exp_2013 %>%
+#                   mutate(longevity_bc_pop_y = longevity^(-1))
+# 
+# pop_lm_2nd <- lm(longevity_bc_pop_y ~ pop, life_exp_2013)
+# 
+# boxcox(pop_lm_2nd)
+# 
+# life_exp_2013 <- life_exp_2013 %>%
+#                   mutate(longevity_bc_pop = pop^(-2))
+# 
+# pop_lm <- lm(longevity_bc_pop_y ~ longevity_bc_pop, life_exp_2013)
+# 
+# pop_lm_aug <- augment(pop_lm)
+# 
+# ggplot(pop_lm_aug, aes(x = .fitted, y = .resid)) +
+#             geom_point() +
+#             labs(title = 'Residuals vs Adult Mortality Transformed',
+#               x = "Adult Mortality Transformed",
+#               y = ".resid") +
+#             theme_minimal()
+# 
+# shapiro.test(pop_lm$residuals)
+# 
+# ols_pure_error_anova(pop_lm)
+
+```
+
+
+> There seems to be fanning in:
+> - adult_mort
+> - inf_death
+> - measles
+> - u5_deaths
+> - aids
+> - pop
+> - thin_1_19
+> - thin_5_9
+
+> There seems to be funneling in:
+> - gdp
+
+> There seems to be a n shape in:
+> - perc_exp
+
+> There seems to be a u shape in:
+> - polio
+> - dipth
+
+
+> The Lack of Fit F Test demonstrates that the there is a lack of fit for the model
+
+
 >
 
 ## Part B – categorical predictors
@@ -164,13 +317,16 @@ summary(country.lm)
 ```
 
 ```{r}
-(year.lm <- lm(longevity ~ year, data = life_exp_2013))
-(summary(year.lm))
+# the year column was removed due to our having selected the year 2013 to analyze
+# however, this is what we would have done had there been more years
+
+# year.lm <- lm(longevity ~ year, data = life_exp)
+# summary(year.lm)
 ```
 
 ```{r}
-(status.lm <- lm(longevity ~ status, data = life_exp_2013))
-(summary(status.lm))
+status.lm <- lm(longevity ~ status, data = life_exp_2013)
+summary(status.lm)
 ```
 
 ##### a. Be sure the categorical variable is stored as a “factor” variable.
