@@ -282,7 +282,7 @@ summary(country.lm)
 ```
 
 ```{r}
-status.lm <- lm(longevity ~ status, data = life_exp_2013)
+status.lm <- lm(longevity ~ life_exp_2013$status.f, data = life_exp_2013)
 summary(status.lm)
 ```
 
@@ -290,6 +290,11 @@ summary(status.lm)
 ```{r}
 life_exp_2013$country.f <- factor(life_exp_2013$country)
 is.factor(life_exp_2013$country.f)
+```
+
+```{r}
+life_exp_2013$status.f <- factor(life_exp_2013$status)
+is.factor(life_exp_2013$status.f)
 ```
 
 ##### b. Use the overall F-test to note the significance of the variable.
