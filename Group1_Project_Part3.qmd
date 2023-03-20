@@ -263,14 +263,17 @@ print(glue('The p value for the transformed longevity vs alcohol is {signif(tidy
 
 ## Part B – categorical predictors
 ### 1. For EACH categorical predictor separately (one at a time), fit a SLR model
-```{r}
-life_exp_2013$country.f <- factor(life_exp_2013$country)
-is.factor(life_exp_2013$country.f)
-```
 
 ```{r}
 country.lm <- lm(longevity ~ life_exp_2013$country.f, data=life_exp_2013)
 summary(country.lm)
+```
+
+```{r}
+continent.lm <- lm(longevity ~ life_exp_2013$continent.f, data=life_exp_2013)
+summary(continent.lm)
+
+# Both continent and country were accounted for, but continent will be used instead. The continent variable is easier to work with. 
 ```
 
 ```{r}
@@ -290,6 +293,9 @@ summary(status.lm)
 ```{r}
 life_exp_2013$country.f <- factor(life_exp_2013$country)
 is.factor(life_exp_2013$country.f)
+
+life_exp_2013$continent.f <- factor(life_exp_2013$continent)
+is.factor(life_exp_2013$continent.f)
 ```
 
 ##### b. Use the overall F-test to note the significance of the variable.
