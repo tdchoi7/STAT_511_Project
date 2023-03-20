@@ -127,7 +127,7 @@ for (i in my_range)
   
   
   # get the p value of the independent variable
-  print(glue('Plots to determine linear assumptions of {colnames_lifeexp[i]}'))
+  print(glue('Plots to determine linear assumptions of {colnames_lifeexp[i]}:'))
   
   # Linearity, Equal Variance
   p1 <- ggplot(data = list_aug_life_exp[[i]],
@@ -205,9 +205,6 @@ boxcox(alcohol_lm)
 life_exp_2013 <- life_exp_2013 %>%
   mutate(perc_exp_trnsfrm = sqrt(log(perc_exp)))
 
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^(2))
-
 perc_exp_lm <- lm(longevity_squared ~ perc_exp_trnsfrm, life_exp_2013)
 
 perc_exp_aug_lm <- augment(perc_exp_lm)
@@ -238,9 +235,6 @@ boxcox(perc_exp_lm)
 
 life_exp_2013 <- life_exp_2013 %>%
   mutate(bmi_trnsfrm = bmi^(2))
-
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^(2))
 
 bmi_lm <- lm(longevity_squared ~ bmi_trnsfrm, life_exp_2013)
 
@@ -273,9 +267,6 @@ boxcox(bmi_lm)
 life_exp_2013 <- life_exp_2013 %>%
   mutate(tot_exp_trnsfrm = tot_exp^(1/2))
 
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^(1))
-
 tot_exp_lm <- lm(longevity_squared ~ tot_exp_trnsfrm, life_exp_2013)
 
 tot_exp_aug_lm <- augment(tot_exp_lm)
@@ -306,9 +297,6 @@ boxcox(tot_exp_lm)
 
 life_exp_2013 <- life_exp_2013 %>%
   mutate(aids_trnsfrm = sqrt(log(aids)), na.rm = TRUE)
-
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^(1))
 
 aids_lm <- lm(longevity_squared ~ aids_trnsfrm, life_exp_2013)
 
@@ -341,9 +329,6 @@ boxcox(aids_lm)
 life_exp_2013 <- life_exp_2013 %>%
   mutate(gdp_trnsfrm = sqrt(log(gdp)))
 
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^(2))
-
 gdp_lm <- lm(longevity_squared ~ gdp_trnsfrm, life_exp_2013)
 
 gdp_aug_lm <- augment(gdp_lm)
@@ -374,9 +359,6 @@ boxcox(gdp_lm)
 
 life_exp_2013 <- life_exp_2013 %>%
   mutate(thin_1_19_trnsfrm = sqrt(thin_1_19))
-
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^(2))
 
 thin_1_19_lm <- lm(longevity_squared ~ thin_1_19_trnsfrm, life_exp_2013)
 
@@ -409,9 +391,6 @@ boxcox(thin_1_19_lm)
 
 life_exp_2013 <- life_exp_2013 %>%
   mutate(thin_5_9_trnsfrm = sqrt(thin_5_9))
-
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^(2))
 
 thin_5_9_lm <- lm(longevity_squared ~ thin_5_9_trnsfrm, life_exp_2013)
 
@@ -446,14 +425,14 @@ boxcox(thin_5_9_lm)
 # dataframe of continuous columns
 # other numerical variables seem to be counts (some based on per 1000, but still count nonetheless)
 life_exp_2013_tfm <- life_exp_2013[,c('longevity_squared',
-                                      'alcohol_trnsfrm',
+                                      'alcohol',
                                       'perc_exp_trnsfrm',
-                                      'bmi_trnsfrm',
-                                      'tot_exp_trnsfrm',
+                                      'bmi',
+                                      'tot_exp',
                                       'aids_trnsfrm',
                                       'gdp_trnsfrm',
-                                      'thin_1_19_trnsfrm',
-                                      'thin_5_9_trnsfrm',
+                                      'thin_1_19',
+                                      'thin_5_9',
                                       'inc_comp',
                                       'school')]
 
@@ -509,10 +488,20 @@ life_exp_2013 %>%
 ## Part C – Preliminary summary
 ### Provide a brief (1 paragraph) summary of your findings so far. Some things to comment on:
 ##### • What variables appear to be associated with your outcome of interest?
-> Some of the variables are associated with our outcome of interest and some of them are not. According to our scatterplot graphs in part 1 and part 2, Percentage Expenditure, BMI, HIV.Aids, GDP, thinness5.9.years, Income.composition.of.resources, and Schooling appear to be associated with our outcome of interest. However, some of them are linearly associated with thee outcome, some of them are curvely associated, and some of them seems to be associated but hard to see any clear model. For example, BMI, Income, and Schooling are having linear relationship; Percentage Expenditure, HIV, and GDP are having curve relationship; thinness is the one that's not clear.
+> Some of the variables are associated with our outcome of interest and some of them are not. According to our scatterplot graphs in part 1 and part 2, Alcohol, Percentage Expenditure, BMI, HIV.Aids, GDP, thinness5.9.years, Income.composition.of.resources, and Schooling appear to be associated with our outcome of interest. However, some of them are linearly associated with the outcome, some of them are non-linearly associated, and some of them may be associated but it is difficult to see the proper relationship. For example, Income and Schooling seem to have a strong linear relationship; Percentage Expenditure, HIV, and GDP have non-linear relationships; the thinness columns do not seem to have clear relationships.
 
 ##### • Do you anticipate using any non-linear terms for any of these predictors (i.e. did you employ any x transformations)?
-> We are probably going to use non-linear terms for Percentage Expenditure, HIV, and GDP since they are not showing linear relationship with Longevity right now.
+> Yes, we made transformations for the response variable as well as Percent Expenditure, HIV.AIDS, and GDP.
 
 ##### • Are there any of your predictor variables that you think might interact with one another? Note – this is not a statistical question but rather asks you to reflect on the substantive knowledge/intuition you have about the context of your data and research question.
-> We do think that some of our predictor variables might interact with one other, and actually we have already discovered some of this kind of relationship. For example in part B in project part 2, we found that Measles is closely related to infant deaths and deaths under 5 years. And based on the current situation of our society, I think some of the predictors is going to affect each other such as percentage expenditure and income, income and GDP, Schooling and GDP, etc.
+> We do think that some of our predictor variables might interact with one other, and actually we have already discovered some of this kind of relationship. For example in part B in project part 2, we found that Measles is closely related to infant deaths and deaths under 5 years. Scholing and Income Composition also look like they will interact with each other. Thinness 1-19 and Thinness 5-9 also look highly correlated. Based on the current situation of our society, I think some of the predictors is going to affect each other such as percentage expenditure and income, income and GDP, Schooling and GDP, etc.
+
+
+
+
+
+
+
+
+
+
