@@ -466,7 +466,24 @@ life_exp_2013$country.f
 
 
 ## Part B – categorical predictors
-### 1. For EACH categorical predictor separately (one at a time), fit a SLR model
+
+##### a. Be sure the categorical variable is stored as a “factor” variable.
+```{r}
+life_exp_2013$country.f <- factor(life_exp_2013$country)
+is.factor(life_exp_2013$country.f)
+```
+
+```{r}
+life_exp_2013$continent.f <- factor(life_exp_2013$continent)
+is.factor(life_exp_2013$continent.f)
+```
+
+```{r}
+life_exp_2013$status.f <- factor(life_exp_2013$status)
+is.factor(life_exp_2013$status.f)
+```
+
+### b. For EACH categorical predictor separately (one at a time), fit a SLR model
 
 ```{r}
 country.lm <- lm(longevity ~ life_exp_2013$country.f, data=life_exp_2013)
@@ -493,25 +510,16 @@ status.lm <- lm(longevity ~ life_exp_2013$status.f, data = life_exp_2013)
 summary(status.lm)
 ```
 
-##### a. Be sure the categorical variable is stored as a “factor” variable.
-```{r}
-life_exp_2013$country.f <- factor(life_exp_2013$country)
-is.factor(life_exp_2013$country.f)
-
-life_exp_2013$continent.f <- factor(life_exp_2013$continent)
-is.factor(life_exp_2013$continent.f)
-```
-
 ```{r}
 life_exp_2013$status.f <- factor(life_exp_2013$status)
 is.factor(life_exp_2013$status.f)
 ```
 
-##### b. Use the overall F-test to note the significance of the variable.
+##### c. Use the overall F-test to note the significance of the variable.
 
 > After looking at the summary for the country, status, and year categorical variables, The F-test of overall significance indicates that the linear regression model provides a better fit to the data than a model that contains no independent variables. This was concluded becuase the p value is less than the t value. 
 
-##### c. Look at the individual t-tests in the summary output and consider whether some levels of the categorical variable are not “statistically” different from one another. Combining this with the plots and tables you created in Project Part 2, are there categories you might “collapse” (combine)? The decision to combine could also be impacted by the amount of data in the categories. If there are many categories determine which categories to collapse at this stage (consider whether the categories make sense to combine too!). If not many categories, just make note of the possible need to collapse later in the model building process.
+##### d. Look at the individual t-tests in the summary output and consider whether some levels of the categorical variable are not “statistically” different from one another. Combining this with the plots and tables you created in Project Part 2, are there categories you might “collapse” (combine)? The decision to combine could also be impacted by the amount of data in the categories. If there are many categories determine which categories to collapse at this stage (consider whether the categories make sense to combine too!). If not many categories, just make note of the possible need to collapse later in the model building process.
 
 ```{r}
 life_exp_2013 %>%
