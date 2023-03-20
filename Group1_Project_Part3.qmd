@@ -54,6 +54,7 @@ head(life_exp_2013)
 ### 1. Produce a scatterplot matrix and the correlation matrix for all continuous predictors and the response variable.
 
 ```{r}
+
 # dataframe of continuous columns
 # other numerical variables seem to be counts (some based on per 1000, but still count nonetheless)
 life_exp_2013_cont <- life_exp_2013[,c('longevity',
@@ -110,7 +111,7 @@ list_aug_life_exp <- lapply(list_lm_life_exp, function(x) augment(x))
 # assigning the summaries of the linear model iterable as an iterable to a variable
 list_lm_life_exp_summ <- lapply(list_lm_life_exp, summary)
 
-list_ftestfit <- lapply(list_lm_life_exp, function(x) ols_pure_error_anova(x))
+# list_ftestfit <- lapply(list_lm_life_exp, function(x) ols_pure_error_anova(x))
 
 
 
@@ -168,16 +169,19 @@ for (i in my_range)
 ###### alcohol
 ```{r}
 
+# transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
   mutate(alcohol_trnsfrm = alcohol^(1/4))
 
+# transform the dependent variable
 life_exp_2013 <- life_exp_2013 %>%
   mutate(longevity_squared = longevity^2)
 
+# fit the model and the augment
 alcohol_lm <- lm(longevity_squared ~ alcohol_trnsfrm, life_exp_2013)
-
 alcohol_aug_lm <- augment(alcohol_lm)
 
+# plot the relevant graphs
 ggplot(data = alcohol_aug_lm,
              aes(y = .resid,
                 x = .fitted)) +    
@@ -202,13 +206,15 @@ boxcox(alcohol_lm)
 ###### perc_exp
 ```{r}
 
+# transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
   mutate(perc_exp_trnsfrm = sqrt(log(perc_exp)))
 
+# fit the model and the augment
 perc_exp_lm <- lm(longevity_squared ~ perc_exp_trnsfrm, life_exp_2013)
-
 perc_exp_aug_lm <- augment(perc_exp_lm)
 
+# plot the relevant graphs
 ggplot(data = perc_exp_aug_lm,
        aes(y = .resid,
            x = .fitted)) +    
@@ -233,13 +239,15 @@ boxcox(perc_exp_lm)
 ###### bmi
 ```{r}
 
+# transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
   mutate(bmi_trnsfrm = bmi^(2))
 
+# fit the model and the augment
 bmi_lm <- lm(longevity_squared ~ bmi_trnsfrm, life_exp_2013)
-
 bmi_aug_lm <- augment(bmi_lm)
 
+# plot the relevant graphs
 ggplot(data = bmi_aug_lm,
                aes(y = .resid,
                    x = .fitted)) +    
@@ -264,13 +272,15 @@ boxcox(bmi_lm)
 ###### tot_exp
 ```{r}
 
+# transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
   mutate(tot_exp_trnsfrm = tot_exp^(1/2))
 
+# fit the model and the augment
 tot_exp_lm <- lm(longevity_squared ~ tot_exp_trnsfrm, life_exp_2013)
-
 tot_exp_aug_lm <- augment(tot_exp_lm)
 
+# plot the relevant graphs
 ggplot(data = tot_exp_aug_lm,
                aes(y = .resid,
                    x = .fitted)) +    
@@ -295,13 +305,15 @@ boxcox(tot_exp_lm)
 ###### aids
 ```{r}
 
+# transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
   mutate(aids_trnsfrm = sqrt(log(aids)), na.rm = TRUE)
 
+# fit the model and the augment
 aids_lm <- lm(longevity_squared ~ aids_trnsfrm, life_exp_2013)
-
 aids_aug_lm <- augment(aids_lm)
 
+# plot the relevant graphs
 ggplot(data = aids_aug_lm,
                aes(y = .resid,
                    x = .fitted)) +    
@@ -326,13 +338,15 @@ boxcox(aids_lm)
 ###### gdp
 ```{r}
 
+# transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
   mutate(gdp_trnsfrm = sqrt(log(gdp)))
 
+# fit the model and the augment
 gdp_lm <- lm(longevity_squared ~ gdp_trnsfrm, life_exp_2013)
-
 gdp_aug_lm <- augment(gdp_lm)
 
+# plot the relevant graphs
 ggplot(data = gdp_aug_lm,
                aes(y = .resid,
                    x = .fitted)) +    
@@ -357,13 +371,15 @@ boxcox(gdp_lm)
 ###### thin_1_19
 ```{r}
 
+# transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
   mutate(thin_1_19_trnsfrm = sqrt(thin_1_19))
 
+# fit the model and the augment
 thin_1_19_lm <- lm(longevity_squared ~ thin_1_19_trnsfrm, life_exp_2013)
-
 thin_1_19_aug_lm <- augment(thin_1_19_lm)
 
+# plot the relevant graphs
 ggplot(data = thin_1_19_aug_lm,
                aes(y = .resid,
                    x = .fitted)) +    
@@ -389,13 +405,15 @@ boxcox(thin_1_19_lm)
 ###### thin_5_9
 ```{r}
 
+# transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
   mutate(thin_5_9_trnsfrm = sqrt(thin_5_9))
 
+# fit the model and the augment
 thin_5_9_lm <- lm(longevity_squared ~ thin_5_9_trnsfrm, life_exp_2013)
-
 thin_5_9_aug_lm <- augment(thin_5_9_lm)
 
+# plot the relevant graphs
 ggplot(data = thin_5_9_aug_lm,
                aes(y = .resid,
                    x = .fitted)) +    
@@ -439,6 +457,11 @@ life_exp_2013_tfm <- life_exp_2013[,c('longevity_squared',
 head(life_exp_2013_tfm)
 
 ```
+
+```{r}
+life_exp_2013$country.f
+```
+
 
 
 
