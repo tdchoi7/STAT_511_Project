@@ -83,12 +83,12 @@ corr_matrix <- ggpairs(life_exp_2013[sapply(life_exp_2013, is.numeric)],
 
 
 ### 2. For EACH predictor separately (one at a time), fit the SLR model and note the significance of the predictor.
+
+##### a. Using your exploratory analysis in Project Part 2 and the scatterplot you created above, you may choose to transform the x variable now if there is a very strong and clear choice of non-linear function. If so, refit the SLR model with the transformed predictor and note the significance.
+
 ```{r}
 # assign column names to variable
 colnames_lifeexp <- names(life_exp_2013[sapply(life_exp_2013, is.numeric)])[-1]
-
-
-# Getting the summaries of the SLR models as an iterable:
 
 # credit to: https://stackoverflow.com/questions/59161144/creating-a-loop-through-a-list-of-variables-for-an-lm-model-in-r
 # assign list of models to variable
@@ -103,6 +103,10 @@ list_aug_life_exp <- lapply(list_lm_life_exp, function(x) augment(x))
 # assigning the summaries of the linear model iterable as an iterable to a variable
 list_lm_life_exp_summ <- lapply(list_lm_life_exp, summary)
 
+list_ftestfit <- lapply(list_lm_life_exp, function(x) ols_pure_error_anova(x))
+
+
+# iterating through the columns to get p-values and linearity assumption plots
 # creating a range for iteration
 my_range <- 1:length(colnames_lifeexp)
 
@@ -110,44 +114,109 @@ my_range <- 1:length(colnames_lifeexp)
 for (i in my_range)
   {
   # get the p value of the independent variable
-  print(glue('The p value for longevity vs {colnames_lifeexp[i]} is {tidy(list_lm_life_exp_summ[[i]])[2,5]}'))
+  print(glue('The p value for longevity vs {colnames_lifeexp[i]} is {signif(tidy(list_lm_life_exp_summ[[i]])[2,5], 3)}'))
+  
+  
   
   # get the p value of the independent variable
   print(glue('Plots to determine linear assumptions of {colnames_lifeexp[i]}'))
   
+  # Linearity, Equal Variance
   p1 <- ggplot(data = list_aug_life_exp[[i]],
                aes(y = .resid,
                    x = .fitted)) +
-        geom_point()
+        geom_point() +
+        labs(title = glue('Residuals vs Fitted for {colnames_lifeexp[i]}'),
+                  x = colnames_lifeexp[i],
+                  y = ".resid") +
+        theme_minimal()
   
+  # Normality
   p2 <- ggplot(data = list_aug_life_exp[[i]],
                aes(sample = .resid)) +    
         geom_qq_line() +
         geom_qq() +
+        labs(title = glue('QQ of Residuals vs {colnames_lifeexp[i]}'),
+                  x = 'Theoretical',
+                  y = "Sample") +
         theme_minimal()
   
+  # Outliers
   p3 <- ggplot(data = list_aug_life_exp[[i]], aes(x = .resid)) +    
         geom_boxplot() + 
+        labs(title = glue('Boxplot of Residuals for longevity vs {colnames_lifeexp[i]}'),
+                  x = 'Theoretical',
+                  y = "Sample") +
         theme_minimal()
   
   print(plot_grid(p1, p2, p3, nrow = 2))
   }
 
 ```
-
-
 > It seems that most of the SLR models comparing the response to the numerical predictors produce a small p value. The only column that did not have a low p values is the population column
 
-##### a. Using your exploratory analysis in Project Part 2 and the scatterplot you created above, you may choose to transform the x variable now if there is a very strong and clear choice of non-linear function. If so, refit the SLR model with the transformed predictor and note the significance.
+> There seems to be the most non-normality in adult_mort and alcohol
+
+##### adult_mort
+```{r}
+
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(adult_mort_trnsfrm = adult_mort^(1/2))
+
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(longevity_trnsfrm = longevity^(2.1))
+
+adultmort_lm <- lm(longevity_trnsfrm ~ adult_mort_trnsfrm, life_exp_2013)
+
+adultmort_aug_lm <- augment(adultmort_lm)
+
+ggplot(data = adultmort_aug_lm,
+               aes(sample = .resid)) +    
+        geom_qq_line() +
+        geom_qq() +
+        labs(title = glue('QQ of Residuals vs adult_mort'),
+                  x = 'Theoretical',
+                  y = "Sample") +
+        theme_minimal()
+
+boxcox(adultmort_lm)
+
+print(glue('The p value for the transformed longevity vs adult_mort is {signif(tidy(summary(adultmort_lm))[2,5], 3)}'))
+
+```
+
+##### alcohol
+```{r}
+
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(alcohol_trnsfrm = alcohol^(-1))
+
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(longevity_trnsfrm = longevity^2.587)
+
+alcohol_lm <- lm(longevity_trnsfrm ~ alcohol_trnsfrm, life_exp_2013)
+
+alcohol_aug_lm <- augment(alcohol_lm)
+
+ggplot(data = alcohol_aug_lm,
+               aes(sample = .resid)) +    
+        geom_qq_line() +
+        geom_qq() +
+        labs(title = glue('QQ of Residuals vs alcohol'),
+                  x = 'Theoretical',
+                  y = "Sample") +
+        theme_minimal()
+
+boxcox(alcohol_lm)
+
+print(glue('The p value for the transformed longevity vs alcohol is {signif(tidy(summary(adultmort_lm))[2,5], 3)}'))
+
+```
+
+> perc_exp, hep_b, measles, bmi, u5_deaths, polio, tot_exp, dipth seem to have minor issues when looking at the QQ plot.
 
 
-
-
-> There seems to be fanning in:
-> - adult_mort
-> - inf_death
-> - measles
-> - u5_deaths
+> There seems to be fanning in measles, u5_deaths
 > - aids
 > - pop
 > - thin_1_19
@@ -191,118 +260,6 @@ for (i in my_range)
 
 ```
 
-```{r}
-# 
-# inf_death_lm_initial <- lm(longevity ~ inf_death, life_exp_2013)
-# 
-# boxcox(inf_death_lm_initial)
-# 
-# life_exp_2013 <- life_exp_2013 %>%
-#                   mutate(longevity_bc_inf_death = inf_death^(4))
-# 
-# inf_death_lm <- lm(longevity_bc_inf_death ~ inf_death, life_exp_2013)
-# 
-# inf_death_lm_aug <- augment(inf_death_lm)
-# 
-# ggplot(inf_death_lm_aug, aes(x = .fitted, y = .resid)) +
-#             geom_point() +
-#             labs(title = 'Residuals vs Adult Mortality Transformed',
-#               x = "Adult Mortality Transformed",
-#               y = ".resid") +
-#             theme_minimal()
-# 
-# shapiro.test(inf_death_lm$residuals)
-# 
-# ols_pure_error_anova(inf_death_lm)
-
-```
-
-```{r}
-
-# perc_exp_lm_initial <- lm(longevity ~ perc_exp, life_exp_2013)
-# 
-# boxcox(perc_exp_lm_initial)
-# 
-# life_exp_2013 <- life_exp_2013 %>%
-#                   mutate(longevity_bc_perc_exp = perc_exp^(10))
-# 
-# perc_exp_lm <- lm(longevity_bc_perc_exp ~ perc_exp, life_exp_2013[complete.cases(life_exp_2013),])
-# 
-# perc_exp_lm_aug <- augment(perc_exp_lm)
-# 
-# ggplot(perc_exp_lm_aug, aes(x = .fitted, y = .resid)) +
-#             geom_point() +
-#             labs(title = 'Residuals vs Adult Mortality Transformed',
-#               x = "Adult Mortality Transformed",
-#               y = ".resid") +
-#             theme_minimal()
-# 
-# shapiro.test(perc_exp_lm$residuals)
-# 
-# ols_pure_error_anova(perc_exp_lm)
-
-```
-
-```{r}
-
-# pop_lm_initial <- lm(longevity ~ pop, life_exp_2013)
-# 
-# boxcox(pop_lm_initial)
-# 
-# 
-# life_exp_2013 <- life_exp_2013 %>%
-#                   mutate(longevity_bc_pop_y = longevity^(-1))
-# 
-# pop_lm_2nd <- lm(longevity_bc_pop_y ~ pop, life_exp_2013)
-# 
-# boxcox(pop_lm_2nd)
-# 
-# life_exp_2013 <- life_exp_2013 %>%
-#                   mutate(longevity_bc_pop = pop^(-2))
-# 
-# pop_lm <- lm(longevity_bc_pop_y ~ longevity_bc_pop, life_exp_2013)
-# 
-# pop_lm_aug <- augment(pop_lm)
-# 
-# ggplot(pop_lm_aug, aes(x = .fitted, y = .resid)) +
-#             geom_point() +
-#             labs(title = 'Residuals vs Adult Mortality Transformed',
-#               x = "Adult Mortality Transformed",
-#               y = ".resid") +
-#             theme_minimal()
-# 
-# shapiro.test(pop_lm$residuals)
-# 
-# ols_pure_error_anova(pop_lm)
-
-```
-
-
-> There seems to be fanning in:
-> - adult_mort
-> - inf_death
-> - measles
-> - u5_deaths
-> - aids
-> - pop
-> - thin_1_19
-> - thin_5_9
-
-> There seems to be funneling in:
-> - gdp
-
-> There seems to be a n shape in:
-> - perc_exp
-
-> There seems to be a u shape in:
-> - polio
-> - dipth
-
-
-> The Lack of Fit F Test demonstrates that the there is a lack of fit for the model
-
-
->
 
 ## Part B – categorical predictors
 ### 1. For EACH categorical predictor separately (one at a time), fit a SLR model
