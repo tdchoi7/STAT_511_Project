@@ -51,7 +51,11 @@ head(life_exp_2013)
 
 
 ## Part A – continuous predictors
+
 ### 1. Produce a scatterplot matrix and the correlation matrix for all continuous predictors and the response variable.
+> We will break up the numerical predictors by continuous and discrete as it seems to be the simplest way of divvying up the numerical variables
+
+### Continuous Variable Analysis
 
 ```{r}
 
@@ -79,7 +83,8 @@ corr_matrix <- ggpairs(life_exp_2013_cont,
                        upper = list(continuous = wrap('cor', size = 3))) + 
                        theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-print(corr_matrix)
+# Commented out due to all of the notification lines
+# print(corr_matrix)
 
 ```
 
@@ -90,26 +95,61 @@ print(corr_matrix)
 > Thinness of Ages 1 to 19 and Thinness of Ages 5 to 9 seem to be quite correlated/possibly colinear (Corr: 0.925). Income Composition of Resources and Schooling also seem to be correlated/possibly colinear (Corr: 0.913). Percent Expenditure on Health as a Percentage of GDP and GDP also seem highly correlated/possibly colinear (Corr: 0.918).
 
 
+### Discrete Variable Analysis
+
+```{r}
+
+# dataframe of categorical variables
+life_exp_2013_categ <- life_exp_2013[,c('longevity', 'country', 'continent', 'status')]
+
+# dataframe of discrete variables
+life_exp_2013_disc_noresponse <- life_exp_2013 [ ! (life_exp_2013) %in% c(life_exp_2013_cont, life_exp_2013_categ)]
+
+# adding response variable
+life_exp_2013_disc <- cbind(life_exp_2013['longevity'], life_exp_2013_disc_noresponse)
+
+# Scatterplot matrix of the data
+pairs(life_exp_2013_disc,
+      upper.panel = NULL,
+      labels = names(life_exp_2013_disc))
+
+# correlation matrix of the data
+corr_matrix <- ggpairs(life_exp_2013_disc,
+                       upper = list(continuous = wrap('cor', size = 3))) + 
+                       theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Commented out due to all of the notification lines
+# print(corr_matrix)
+
+```
+##### a. Which variables appear most related to the response?
+> It seems that Adult Mortality (Corr: 0.723) is most related to the response
+
+##### b. Is there the potential of an issue with predictor (x) variables that are highly correlated (which variables)?
+> Infant Deaths and Under 5 Deaths seem to be quite correlated/possibly colinear (Corr: 0.997). Hepatitis B and Diptheria also seem to be correlated/possibly colinear (Corr: 0.711)
+
 ### 2. For EACH predictor separately (one at a time), fit the SLR model and note the significance of the predictor.
 
 ##### a. Using your exploratory analysis in Project Part 2 and the scatterplot you created above, you may choose to transform the x variable now if there is a very strong and clear choice of non-linear function. If so, refit the SLR model with the transformed predictor and note the significance.
 
+### Continuous Variable Analysis
+
 ```{r}
 # assign column names to variable
-colnames_lifeexp <- names(life_exp_2013_cont)[-1]
+colnames_lifeexp_cont <- names(life_exp_2013_cont)[-1]
 
 # credit to: https://stackoverflow.com/questions/59161144/creating-a-loop-through-a-list-of-variables-for-an-lm-model-in-r
 # assign list of models to variable
-list_formulas <- lapply(paste("longevity ~", colnames_lifeexp), as.formula)
+list_formulas_cont <- lapply(paste("longevity ~", colnames_lifeexp_cont), as.formula)
 
 # apply linear model function to the list of variables
-list_lm_life_exp <- lapply(list_formulas, function(x) lm(x, data = life_exp_2013))
+list_lm_life_exp_cont <- lapply(list_formulas_cont, function(x) lm(x, data = life_exp_2013_cont))
 
 # apply augment function to the list of linear models
-list_aug_life_exp <- lapply(list_lm_life_exp, function(x) augment(x))
+list_aug_life_exp_cont <- lapply(list_lm_life_exp_cont, function(x) augment(x))
 
 # assigning the summaries of the linear model iterable as an iterable to a variable
-list_lm_life_exp_summ <- lapply(list_lm_life_exp, summary)
+list_lm_life_exp_summ_cont <- lapply(list_lm_life_exp_cont, summary)
 
 # list_ftestfit <- lapply(list_lm_life_exp, function(x) ols_pure_error_anova(x))
 
@@ -117,43 +157,43 @@ list_lm_life_exp_summ <- lapply(list_lm_life_exp, summary)
 
 # iterating through the columns to get p-values and linearity assumption plots
 # creating a range for iteration
-my_range <- 1:length(colnames_lifeexp)
+my_range <- 1:length(colnames_lifeexp_cont)
 
 # outputting relevant plots
 for (i in my_range)
   {
   # get the p value of the independent variable
-  print(glue('The p value for longevity vs {colnames_lifeexp[i]} is {signif(tidy(list_lm_life_exp_summ[[i]])[2,5], 3)}'))
+  print(glue('The p value for longevity vs {colnames_lifeexp_cont[i]} is {signif(tidy(list_lm_life_exp_summ_cont[[i]])[2,5], 3)}'))
   
   
   
   # get the p value of the independent variable
-  print(glue('Plots to determine linear assumptions of {colnames_lifeexp[i]}:'))
+  print(glue('Plots to determine linear assumptions of {colnames_lifeexp_cont[i]}:'))
   
   # Linearity, Equal Variance
-  p1 <- ggplot(data = list_aug_life_exp[[i]],
+  p1 <- ggplot(data = list_aug_life_exp_cont[[i]],
                aes(y = .resid,
                    x = .fitted)) +
         geom_point() +
-        labs(title = glue('Residuals vs Fitted for {colnames_lifeexp[i]}'),
-                  x = colnames_lifeexp[i],
+        labs(title = glue('Residuals vs Fitted for {colnames_lifeexp_cont[i]}'),
+                  x = colnames_lifeexp_cont[i],
                   y = ".resid") +
         theme_minimal()
   
   # Normality
-  p2 <- ggplot(data = list_aug_life_exp[[i]],
+  p2 <- ggplot(data = list_aug_life_exp_cont[[i]],
                aes(sample = .resid)) +    
         geom_qq_line() +
         geom_qq() +
-        labs(title = glue('QQ of Residuals vs {colnames_lifeexp[i]}'),
+        labs(title = glue('QQ of Residuals vs {colnames_lifeexp_cont[i]}'),
                   x = 'Theoretical',
                   y = "Sample") +
         theme_minimal()
   
   # Outliers
-  p3 <- ggplot(data = list_aug_life_exp[[i]], aes(x = .resid)) +    
+  p3 <- ggplot(data = list_aug_life_exp_cont[[i]], aes(x = .resid)) +    
         geom_boxplot() + 
-        labs(title = glue('Boxplot of Residuals for longevity vs {colnames_lifeexp[i]}'),
+        labs(title = glue('Boxplot of Residuals for longevity vs {colnames_lifeexp_cont[i]}'),
                   x = 'Theoretical',
                   y = "Sample") +
         theme_minimal()
@@ -171,7 +211,7 @@ for (i in my_range)
 
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
-  mutate(alcohol_trnsfrm = alcohol^(1/4))
+  mutate(alcohol_trnsfrm = alcohol^(1/2))
 
 # transform the dependent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -208,7 +248,7 @@ boxcox(alcohol_lm)
 
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
-  mutate(perc_exp_trnsfrm = sqrt(log(perc_exp)))
+  mutate(perc_exp_trnsfrm = (log(perc_exp))^(1/2))
 
 # fit the model and the augment
 perc_exp_lm <- lm(longevity_squared ~ perc_exp_trnsfrm, life_exp_2013)
@@ -442,27 +482,445 @@ boxcox(thin_5_9_lm)
 
 # dataframe of continuous columns
 # other numerical variables seem to be counts (some based on per 1000, but still count nonetheless)
-life_exp_2013_tfm <- life_exp_2013[,c('longevity_squared',
-                                      'alcohol',
-                                      'perc_exp_trnsfrm',
-                                      'bmi',
-                                      'tot_exp',
-                                      'aids_trnsfrm',
-                                      'gdp_trnsfrm',
-                                      'thin_1_19',
-                                      'thin_5_9',
-                                      'inc_comp',
-                                      'school')]
+life_exp_2013_tfm_cont <- life_exp_2013[,c('longevity_squared',
+                                           'alcohol',
+                                           'perc_exp_trnsfrm',
+                                           'bmi',
+                                           'tot_exp',
+                                           'aids_trnsfrm',
+                                           'gdp_trnsfrm',
+                                           'thin_1_19',
+                                           'thin_5_9',
+                                           'inc_comp',
+                                           'school')]
+
+head(life_exp_2013_tfm_cont)
+
+```
+
+
+
+### Discrete Variable Analysis
+
+```{r}
+# assign column names to variable
+colnames_lifeexp_disc <- names(life_exp_2013_disc)[-1]
+
+# credit to: https://stackoverflow.com/questions/59161144/creating-a-loop-through-a-list-of-variables-for-an-lm-model-in-r
+# assign list of models to variable
+list_formulas_disc <- lapply(paste("longevity ~", colnames_lifeexp_disc), as.formula)
+
+# apply linear model function to the list of variables
+list_lm_life_exp_disc <- lapply(list_formulas_disc, function(x) lm(x, data = life_exp_2013_disc))
+
+# apply augment function to the list of linear models
+list_aug_life_exp_disc <- lapply(list_lm_life_exp_disc, function(x) augment(x))
+
+# assigning the summaries of the linear model iterable as an iterable to a variable
+list_lm_life_exp_summ_disc <- lapply(list_lm_life_exp_disc, summary)
+
+# list_ftestfit <- lapply(list_lm_life_exp, function(x) ols_pure_error_anova(x))
+
+
+
+# iterating through the columns to get p-values and linearity assumption plots
+# creating a range for iteration
+my_range <- 1:length(colnames_lifeexp_disc)
+
+# outputting relevant plots
+for (i in my_range)
+  {
+  # get the p value of the independent variable
+  print(glue('The p value for longevity vs {colnames_lifeexp_disc[i]} is {signif(tidy(list_lm_life_exp_summ_disc[[i]])[2,5], 3)}'))
+  
+  
+  
+  # get the p value of the independent variable
+  print(glue('Plots to determine linear assumptions of {colnames_lifeexp_disc[i]}:'))
+  
+  # Linearity, Equal Variance
+  p1 <- ggplot(data = list_aug_life_exp_disc[[i]],
+               aes(y = .resid,
+                   x = .fitted)) +
+        geom_point() +
+        labs(title = glue('Residuals vs Fitted for {colnames_lifeexp_disc[i]}'),
+                  x = colnames_lifeexp_disc[i],
+                  y = ".resid") +
+        theme_minimal()
+  
+  # Normality
+  p2 <- ggplot(data = list_aug_life_exp_disc[[i]],
+               aes(sample = .resid)) +    
+        geom_qq_line() +
+        geom_qq() +
+        labs(title = glue('QQ of Residuals vs {colnames_lifeexp_disc[i]}'),
+                  x = 'Theoretical',
+                  y = "Sample") +
+        theme_minimal()
+  
+  # Outliers
+  p3 <- ggplot(data = list_aug_life_exp_disc[[i]], aes(x = .resid)) +    
+        geom_boxplot() + 
+        labs(title = glue('Boxplot of Residuals for longevity vs {colnames_lifeexp_disc[i]}'),
+                  x = 'Theoretical',
+                  y = "Sample") +
+        theme_minimal()
+  
+  print(plot_grid(p1, p2, p3, nrow = 2))
+  }
+
+```
+> It seems that most of the SLR models comparing the response to the numerical predictors produce a small p value, except for Measles and Population
+
+###### adult_mort
+```{r}
+
+# transform the independent variable
+# the commented section does spread out the points, but does not seem very helpful for the time being
+# life_exp_2013 <- life_exp_2013 %>%
+#   mutate(adult_mort_trnsfrm = adult_mort^(1/3))
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(adult_mort_trnsfrm = adult_mort^(1))
+
+# transform the dependent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(longevity_squared = longevity^1)
+
+# fit the model and the augment
+adult_mort_lm <- lm(longevity_squared ~ adult_mort_trnsfrm, life_exp_2013)
+adult_mort_aug_lm <- augment(adult_mort_lm)
+
+# plot the relevant graphs
+ggplot(data = adult_mort_aug_lm,
+             aes(y = .resid,
+                x = .fitted)) +    
+      geom_point() +
+      labs(title = 'Residuals vs adult_mort') +
+      theme_minimal()
+
+ ggplot(data = adult_mort_aug_lm,
+             aes(sample = .resid)) +    
+      geom_qq_line() +
+      geom_qq() +
+      labs(title = 'QQ of adult_mort',
+           x = 'Theoretical',
+           y = "Sample") +
+      theme_minimal()
+
+boxcox(adult_mort_lm)
+
+```
+> The p value for transformed longevity vs the transformed adult_mort is `r signif(tidy(summary(adult_mort_lm))[2,5], 3)`
+
+###### inf_death
+```{r}
+
+# transform the independent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(inf_death_trnsfrm = inf_death^(1/2))
+
+# transform the dependent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(longevity_squared = longevity^1)
+
+# fit the model and the augment
+inf_death_lm <- lm(longevity_squared ~ inf_death_trnsfrm, life_exp_2013)
+inf_death_aug_lm <- augment(inf_death_lm)
+
+# plot the relevant graphs
+ggplot(data = inf_death_aug_lm,
+             aes(y = .resid,
+                x = .fitted)) +    
+      geom_point() +
+      labs(title = 'Residuals vs inf_death') +
+      theme_minimal()
+
+ ggplot(data = inf_death_aug_lm,
+             aes(sample = .resid)) +    
+      geom_qq_line() +
+      geom_qq() +
+      labs(title = 'QQ of inf_death',
+           x = 'Theoretical',
+           y = "Sample") +
+      theme_minimal()
+
+boxcox(inf_death_lm)
+
+```
+> The p value for transformed longevity vs the transformed inf_death is `r signif(tidy(summary(inf_death_lm))[2,5], 3)`
+
+###### hep_b
+```{r}
+
+# transform the independent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(hep_b_trnsfrm = hep_b^(4))
+
+# transform the dependent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(longevity_squared = longevity^1)
+
+# fit the model and the augment
+hep_b_lm <- lm(longevity_squared ~ hep_b_trnsfrm, life_exp_2013)
+hep_b_aug_lm <- augment(hep_b_lm)
+
+# plot the relevant graphs
+ggplot(data = hep_b_aug_lm,
+             aes(y = .resid,
+                x = .fitted)) +    
+      geom_point() +
+      labs(title = 'Residuals vs hep_b') +
+      theme_minimal()
+
+ ggplot(data = hep_b_aug_lm,
+             aes(sample = .resid)) +    
+      geom_qq_line() +
+      geom_qq() +
+      labs(title = 'QQ of hep_b',
+           x = 'Theoretical',
+           y = "Sample") +
+      theme_minimal()
+
+boxcox(hep_b_lm)
+
+```
+> The p value for transformed longevity vs the transformed hep_b is `r signif(tidy(summary(hep_b_lm))[2,5], 3)`
+
+###### measles
+```{r}
+
+# transform the independent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(measles_trnsfrm = measles^(4))
+
+# transform the dependent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(longevity_squared = longevity^1)
+
+# fit the model and the augment
+measles_lm <- lm(longevity_squared ~ measles_trnsfrm, life_exp_2013)
+measles_aug_lm <- augment(measles_lm)
+
+# plot the relevant graphs
+ggplot(data = measles_aug_lm,
+             aes(y = .resid,
+                x = .fitted)) +    
+      geom_point() +
+      labs(title = 'Residuals vs measles') +
+      theme_minimal()
+
+ggplot(data = measles_aug_lm,
+             aes(sample = .resid)) +    
+      geom_qq_line() +
+      geom_qq() +
+      labs(title = 'QQ of measles',
+           x = 'Theoretical',
+           y = "Sample") +
+      theme_minimal()
+
+boxcox(measles_lm)
+
+```
+> The p value for transformed longevity vs the transformed measles is `r signif(tidy(summary(measles_lm))[2,5], 3)`
+
+
+###### u5_deaths
+```{r}
+
+# transform the independent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(u5_deaths_trnsfrm = u5_deaths^(1/3))
+
+# transform the dependent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(longevity_squared = longevity^1)
+
+# fit the model and the augment
+u5_deaths_lm <- lm(longevity_squared ~ u5_deaths_trnsfrm, life_exp_2013)
+u5_deaths_aug_lm <- augment(u5_deaths_lm)
+
+# plot the relevant graphs
+ggplot(data = u5_deaths_aug_lm,
+             aes(y = .resid,
+                x = .fitted)) +    
+      geom_point() +
+      labs(title = 'Residuals vs u5_deaths') +
+      theme_minimal()
+
+ggplot(data = u5_deaths_aug_lm,
+             aes(sample = .resid)) +    
+      geom_qq_line() +
+      geom_qq() +
+      labs(title = 'QQ of u5_deaths',
+           x = 'Theoretical',
+           y = "Sample") +
+      theme_minimal()
+
+boxcox(u5_deaths_lm)
+
+```
+> The p value for transformed longevity vs the transformed u5_deaths is `r signif(tidy(summary(u5_deaths_lm))[2,5], 3)`
+
+
+###### polio
+```{r}
+
+# transform the independent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(polio_trnsfrm = polio^(5))
+
+# transform the dependent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(longevity_squared = longevity^1)
+
+# fit the model and the augment
+polio_lm <- lm(longevity_squared ~ polio_trnsfrm, life_exp_2013)
+polio_aug_lm <- augment(polio_lm)
+
+# plot the relevant graphs
+ggplot(data = polio_aug_lm,
+             aes(y = .resid,
+                x = .fitted)) +    
+      geom_point() +
+      labs(title = 'Residuals vs polio') +
+      theme_minimal()
+
+ggplot(data = polio_aug_lm,
+             aes(sample = .resid)) +    
+      geom_qq_line() +
+      geom_qq() +
+      labs(title = 'QQ of polio',
+           x = 'Theoretical',
+           y = "Sample") +
+      theme_minimal()
+
+boxcox(polio_lm)
+
+```
+> The p value for transformed longevity vs the transformed polio is `r signif(tidy(summary(polio_lm))[2,5], 3)`
+
+###### dipth
+```{r}
+
+# transform the independent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(dipth_trnsfrm = dipth^(6))
+
+# transform the dependent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(longevity_squared = longevity^1)
+
+# fit the model and the augment
+dipth_lm <- lm(longevity_squared ~ dipth_trnsfrm, life_exp_2013)
+dipth_aug_lm <- augment(dipth_lm)
+
+# plot the relevant graphs
+ggplot(data = dipth_aug_lm,
+             aes(y = .resid,
+                x = .fitted)) +    
+      geom_point() +
+      labs(title = 'Residuals vs dipth') +
+      theme_minimal()
+
+ggplot(data = dipth_aug_lm,
+             aes(sample = .resid)) +    
+      geom_qq_line() +
+      geom_qq() +
+      labs(title = 'QQ of dipth',
+           x = 'Theoretical',
+           y = "Sample") +
+      theme_minimal()
+
+boxcox(dipth_lm)
+
+```
+> The p value for transformed longevity vs the transformed dipth is `r signif(tidy(summary(dipth_lm))[2,5], 3)`
+
+###### pop
+```{r}
+
+# transform the independent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(pop_trnsfrm = log(pop))
+
+# transform the dependent variable
+life_exp_2013 <- life_exp_2013 %>%
+  mutate(longevity_squared = longevity^1)
+
+# fit the model and the augment
+pop_lm <- lm(longevity_squared ~ pop_trnsfrm, life_exp_2013)
+pop_aug_lm <- augment(pop_lm)
+
+# plot the relevant graphs
+ggplot(data = pop_aug_lm,
+             aes(y = .resid,
+                x = .fitted)) +    
+      geom_point() +
+      labs(title = 'Residuals vs pop') +
+      theme_minimal()
+
+ggplot(data = pop_aug_lm,
+             aes(sample = .resid)) +    
+      geom_qq_line() +
+      geom_qq() +
+      labs(title = 'QQ of pop',
+           x = 'Theoretical',
+           y = "Sample") +
+      theme_minimal()
+
+boxcox(pop_lm)
+
+```
+> The p value for transformed longevity vs the transformed pop is `r signif(tidy(summary(pop_lm))[2,5], 3)`
+
+> We will transform the dataset as follows:
+
+```{r}
+
+# dataframe of continuous columns
+# other numerical variables seem to be counts (some based on per 1000, but still count nonetheless)
+life_exp_2013_tfm_disc <- life_exp_2013[,c('adult_mort_trnsfrm',
+                                           'inf_death_trnsfrm',
+                                           'hep_b_trnsfrm',
+                                           'measles_trnsfrm',
+                                           'u5_deaths_trnsfrm',
+                                           'polio_trnsfrm',
+                                           'dipth_trnsfrm',
+                                           'pop_trnsfrm')]
+
+life_exp_2013_tfm <- cbind(life_exp_2013_tfm_cont, life_exp_2013_tfm_disc)
 
 head(life_exp_2013_tfm)
 
 ```
 
+
+> There is a possibility that we are not capturing relationships between certain numerical variables because we broke up the analysis between categorical and discrete variables. Below, we can see the scatterplot matrix and correlation matrix for all numerical variables
+
+
 ```{r}
-life_exp_2013$country.f
+
+# dataframe of numeric columns
+# get all numeric columns
+life_exp_2013_num_unfiltered <- life_exp_2013[, unlist(lapply(life_exp_2013, is.numeric))]
+
+# exclude columns that contain substrings below
+life_exp_2013_num <- life_exp_2013[!grepl('trnsfrm|squared|country|continent|status', names(life_exp_2013))]
+
+# Scatterplot matrix of the data
+pairs(life_exp_2013_num,
+      upper.panel = NULL,
+      labels = names(life_exp_2013_num))
+
+# correlation matrix of the data
+corr_matrix <- ggpairs(life_exp_2013_num,
+                       upper = list(continuous = wrap('cor', size = 1))) + 
+                       theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Commented out due to all of the notification lines
+# print(corr_matrix)
+
 ```
-
-
 
 
 ## Part B – categorical predictors
