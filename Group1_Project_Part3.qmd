@@ -691,7 +691,7 @@ boxcox(hep_b_lm)
 
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
-  mutate(measles_trnsfrm = measles^(4))
+  mutate(measles_trnsfrm = measles^(1/4))
 
 # transform the dependent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -729,7 +729,7 @@ boxcox(measles_lm)
 
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
-  mutate(u5_deaths_trnsfrm = u5_deaths^(1/3))
+  mutate(u5_deaths_trnsfrm = u5_deaths^(1/2))
 
 # transform the dependent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -871,7 +871,7 @@ ggplot(data = pop_aug_lm,
 boxcox(pop_lm)
 
 ```
-> The p value for transformed longevity vs the transformed pop is `r signif(tidy(summary(pop_lm))[2,5], 3)`
+> The p value for transformed longevity vs the transformed pop is `r signif(tidy(summary(pop_lm))[2,5], 3)` which is an improvement over not transforming the variable, but still not significant
 
 > We will transform the dataset as follows:
 
@@ -888,9 +888,15 @@ life_exp_2013_tfm_disc <- life_exp_2013[,c('adult_mort_trnsfrm',
                                            'dipth_trnsfrm',
                                            'pop_trnsfrm')]
 
-life_exp_2013_tfm <- cbind(life_exp_2013_tfm_cont, life_exp_2013_tfm_disc)
+life_exp_2013_response <- life_exp_2013[,'longevity']
 
-head(life_exp_2013_tfm)
+# assign transformed columns to variable
+life_exp_2013_tfm_num <- cbind(life_exp_2013_tfm_cont,
+                               life_exp_2013_tfm_disc,
+                               life_exp_2013_response)[-1]
+
+# output dataframe
+head(life_exp_2013_tfm_num)
 
 ```
 
@@ -904,8 +910,12 @@ head(life_exp_2013_tfm)
 # get all numeric columns
 life_exp_2013_num_unfiltered <- life_exp_2013[, unlist(lapply(life_exp_2013, is.numeric))]
 
+head(life_exp_2013_num_unfiltered)
+
 # exclude columns that contain substrings below
 life_exp_2013_num <- life_exp_2013[!grepl('trnsfrm|squared|country|continent|status', names(life_exp_2013))]
+
+head(life_exp_2013_num)
 
 # Scatterplot matrix of the data
 pairs(life_exp_2013_num,
@@ -914,42 +924,52 @@ pairs(life_exp_2013_num,
 
 # correlation matrix of the data
 corr_matrix <- ggpairs(life_exp_2013_num,
-                       upper = list(continuous = wrap('cor', size = 1))) + 
+                       upper = list(continuous = wrap('cor', size = 3))) + 
                        theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 # Commented out due to all of the notification lines
 # print(corr_matrix)
 
 ```
-
+> Held off on response variable transformations as suggested by Dr Fitz
 
 ## Part B – categorical predictors
 
 ##### a. Be sure the categorical variable is stored as a “factor” variable.
 ```{r}
+# factorize the categorical variable
 life_exp_2013$country.f <- factor(life_exp_2013$country)
+# check successful factorization
 is.factor(life_exp_2013$country.f)
 ```
 
 ```{r}
+# factorize the categorical variable
 life_exp_2013$continent.f <- factor(life_exp_2013$continent)
+# check successful factorization
 is.factor(life_exp_2013$continent.f)
 ```
 
 ```{r}
+# factorize the categorical variable
 life_exp_2013$status.f <- factor(life_exp_2013$status)
+# check successful factorization
 is.factor(life_exp_2013$status.f)
 ```
 
 ### b. For EACH categorical predictor separately (one at a time), fit a SLR model
 
 ```{r}
+# fit the linear model to the categorical variable
 country.lm <- lm(longevity ~ life_exp_2013$country.f, data=life_exp_2013)
+# output summary
 summary(country.lm)
 ```
 
 ```{r}
+# fit the linear model to the categorical variable
 continent.lm <- lm(longevity ~ life_exp_2013$continent.f, data=life_exp_2013)
+# output summary
 summary(continent.lm)
 
 # Both continent and country were accounted for, but continent will be used instead. The continent variable is easier to work with. 
@@ -964,14 +984,12 @@ summary(continent.lm)
 ```
 
 ```{r}
+# fit the linear model to the categorical variable
 status.lm <- lm(longevity ~ life_exp_2013$status.f, data = life_exp_2013)
+# output summary
 summary(status.lm)
 ```
 
-```{r}
-life_exp_2013$status.f <- factor(life_exp_2013$status)
-is.factor(life_exp_2013$status.f)
-```
 
 ##### c. Use the overall F-test to note the significance of the variable.
 
@@ -983,7 +1001,7 @@ is.factor(life_exp_2013$status.f)
 life_exp_2013 %>%
   count(country, name = "CountByCou", sort = TRUE)
 ```
-> The country variable would be a variable we would consider collapsing as there are too many categories within. With over 180 countries, it is difficult to make a simple regression model and obtain other statistics.
+> The country variable would be a variable we will collapse (we actually have already done this and have a continents column) as there are too many categories within. With over 180 countries, it is difficult to make a simple regression model and obtain other statistics.
 
 ## Part C – Preliminary summary
 ### Provide a brief (1 paragraph) summary of your findings so far. Some things to comment on:
@@ -996,6 +1014,27 @@ life_exp_2013 %>%
 ##### • Are there any of your predictor variables that you think might interact with one another? Note – this is not a statistical question but rather asks you to reflect on the substantive knowledge/intuition you have about the context of your data and research question.
 > We do think that some of our predictor variables might interact with one other, and actually we have already discovered some of this kind of relationship. For example in part B in project part 2, we found that Measles is closely related to infant deaths and deaths under 5 years. Scholing and Income Composition also look like they will interact with each other. Thinness 1-19 and Thinness 5-9 also look highly correlated. Based on the current situation of our society, I think some of the predictors is going to affect each other such as percentage expenditure and income, income and GDP, Schooling and GDP, etc.
 
+
+```{r}
+# Exporting Dataset
+life_exp_2013_fact <- life_exp_2013[,c('continent.f', 'status.f')]
+
+# assign transformed columns to variable
+life_exp_2013_tfm <- cbind(life_exp_2013_tfm_num, life_exp_2013_fact)
+
+# rearrange data
+life_exp_2013_tfm <- life_exp_2013_tfm[, c(19, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+                                           12, 13, 14, 15, 16, 17, 18, 20, 21)]
+
+# output dataframe
+head(life_exp_2013_tfm)
+
+# assign filepaths to variables
+filepath_2013_tfm <- "./data/longevity Data Cleaned Version 2013 TFM.rds"
+
+# save to csv
+saveRDS(life_exp_2013_tfm, filepath_2013_tfm)
+```
 
 
 
