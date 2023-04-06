@@ -48,9 +48,6 @@ filepath_2013 <- "./data/longevity Data Cleaned Version 2013 TFM.rds"
 
 life_exp_2013 <- readRDS(filepath_2013)
 
-# show the top rows of the dataframe
-head(life_exp_2013)
-
 ```
 
 
@@ -60,13 +57,69 @@ head(life_exp_2013)
 
 ##### a. Make sure all variables have been transformed appropriately, as necessary.
 ```{r}
+head(life_exp_2013[,2:19])
+```
+
+
+```{r}
+
+# show the top rows of the dataframe to show if they include the transformations
+head(life_exp_2013)
+
+# scaling all numeric data
+# life_exp_2013[,-1] <- life_exp_2013[,-1] %>% mutate(across(where(is.numeric), scale))
+
+# converting necessary columns back to numeric after scaling
+# life_exp_2013[,2:19] <- lapply(life_exp_2013[,2:19], as.numeric)
+
+# check if transformations held
+sapply(life_exp_2013, class)
+
+levels(life_exp_2013$continent)
+levels(life_exp_2013$status)
+
+
+# fitting the model
+# lm_le_2013 <- lm(life_exp_2013_response ~ scale(alcohol) +
+#                                           scale(perc_exp_trnsfrm) +
+#                                           scale(bmi) +
+#                                           scale(tot_exp) +
+#                                           scale(aids_trnsfrm) +
+#                                           scale(gdp_trnsfrm) +
+#                                           scale(thin_1_19) +
+#                                           scale(thin_5_9) +
+#                                           scale(inc_comp) +
+#                                           scale(school) +
+#                                           scale(adult_mort_trnsfrm) +
+#                                           scale(inf_death_trnsfrm) +
+#                                           scale(hep_b_trnsfrm) +
+#                                           scale(measles_trnsfrm) +
+#                                           scale(u5_deaths_trnsfrm) +
+#                                           scale(polio_trnsfrm) +
+#                                           scale(dipth_trnsfrm) +
+#                                           scale(pop_trnsfrm) +
+#                                           continent + status, data = life_exp_2013)
+
+# fitting the model
+# lm_le_2013 <- lm(life_exp_2013_response ~ continent + status, data = life_exp_2013)
+
+# checking model
+# summary(lm_life_exp)
 
 ```
 
 ##### b. You should combine levels of categorical variables at this step if necessary.
 ```{r}
 
+
+
 ```
+
+
+```{r}
+
+```
+
 
 ### 2. Fit a main effects (no interactions) model with the full set of P-1 predictors
 ```{r}
