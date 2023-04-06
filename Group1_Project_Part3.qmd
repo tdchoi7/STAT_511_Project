@@ -3,12 +3,16 @@ title: "Project Part 3"
 subtitle: "STAT 511"
 author: "Moses Sanches, Shuyu Wang, Theodore Choi"
 date: "`r Sys.Date()`"
-output: 
-  html_document:
+format: 
+  html:
+    self-contained: true
     toc: true
     toc_float: true
-    number_section: false
+    number-section: false
     highlight: tango
+editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r}
@@ -58,7 +62,8 @@ head(life_exp_2013)
 ### Continuous Variable Analysis
 
 ```{r}
-
+#| message: false
+#| warning: false
 # dataframe of continuous columns
 # other numerical variables seem to be counts (some based on per 1000, but still count nonetheless)
 life_exp_2013_cont <- life_exp_2013[,c('longevity',
@@ -84,7 +89,7 @@ corr_matrix <- ggpairs(life_exp_2013_cont,
                        theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 # Commented out due to all of the notification lines
-# print(corr_matrix)
+print(corr_matrix)
 
 ```
 
@@ -98,7 +103,8 @@ corr_matrix <- ggpairs(life_exp_2013_cont,
 ### Discrete Variable Analysis
 
 ```{r}
-
+#| message: false
+#| warning: false
 # dataframe of categorical variables
 life_exp_2013_categ <- life_exp_2013[,c('longevity', 'country', 'continent', 'status')]
 
@@ -214,11 +220,11 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(alcohol_trnsfrm = alcohol^(1/2))
 
 # transform the dependent variable
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^2)
+# life_exp_2013 <- life_exp_2013 %>%
+#   mutate(longevity_squared = longevity^2)
 
 # fit the model and the augment
-alcohol_lm <- lm(longevity_squared ~ alcohol_trnsfrm, life_exp_2013)
+alcohol_lm <- lm(longevity ~ alcohol_trnsfrm, life_exp_2013)
 alcohol_aug_lm <- augment(alcohol_lm)
 
 # plot the relevant graphs
@@ -251,7 +257,7 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(perc_exp_trnsfrm = (log(perc_exp))^(1/2))
 
 # fit the model and the augment
-perc_exp_lm <- lm(longevity_squared ~ perc_exp_trnsfrm, life_exp_2013)
+perc_exp_lm <- lm(longevity ~ perc_exp_trnsfrm, life_exp_2013)
 perc_exp_aug_lm <- augment(perc_exp_lm)
 
 # plot the relevant graphs
@@ -284,7 +290,7 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(bmi_trnsfrm = bmi^(2))
 
 # fit the model and the augment
-bmi_lm <- lm(longevity_squared ~ bmi_trnsfrm, life_exp_2013)
+bmi_lm <- lm(longevity ~ bmi_trnsfrm, life_exp_2013)
 bmi_aug_lm <- augment(bmi_lm)
 
 # plot the relevant graphs
@@ -317,7 +323,7 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(tot_exp_trnsfrm = tot_exp^(1/2))
 
 # fit the model and the augment
-tot_exp_lm <- lm(longevity_squared ~ tot_exp_trnsfrm, life_exp_2013)
+tot_exp_lm <- lm(longevity ~ tot_exp_trnsfrm, life_exp_2013)
 tot_exp_aug_lm <- augment(tot_exp_lm)
 
 # plot the relevant graphs
@@ -350,7 +356,7 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(aids_trnsfrm = sqrt(log(aids)), na.rm = TRUE)
 
 # fit the model and the augment
-aids_lm <- lm(longevity_squared ~ aids_trnsfrm, life_exp_2013)
+aids_lm <- lm(longevity ~ aids_trnsfrm, life_exp_2013)
 aids_aug_lm <- augment(aids_lm)
 
 # plot the relevant graphs
@@ -383,7 +389,7 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(gdp_trnsfrm = sqrt(log(gdp)))
 
 # fit the model and the augment
-gdp_lm <- lm(longevity_squared ~ gdp_trnsfrm, life_exp_2013)
+gdp_lm <- lm(longevity ~ gdp_trnsfrm, life_exp_2013)
 gdp_aug_lm <- augment(gdp_lm)
 
 # plot the relevant graphs
@@ -413,10 +419,10 @@ boxcox(gdp_lm)
 
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
-  mutate(thin_1_19_trnsfrm = sqrt(thin_1_19))
+  mutate(thin_1_19_trnsfrm = (thin_1_19)^(1/4))
 
 # fit the model and the augment
-thin_1_19_lm <- lm(longevity_squared ~ thin_1_19_trnsfrm, life_exp_2013)
+thin_1_19_lm <- lm(longevity ~ thin_1_19_trnsfrm, life_exp_2013)
 thin_1_19_aug_lm <- augment(thin_1_19_lm)
 
 # plot the relevant graphs
@@ -447,10 +453,10 @@ boxcox(thin_1_19_lm)
 
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
-  mutate(thin_5_9_trnsfrm = sqrt(thin_5_9))
+  mutate(thin_5_9_trnsfrm = (thin_5_9)^(1/4))
 
 # fit the model and the augment
-thin_5_9_lm <- lm(longevity_squared ~ thin_5_9_trnsfrm, life_exp_2013)
+thin_5_9_lm <- lm(longevity ~ thin_5_9_trnsfrm, life_exp_2013)
 thin_5_9_aug_lm <- augment(thin_5_9_lm)
 
 # plot the relevant graphs
@@ -482,7 +488,7 @@ boxcox(thin_5_9_lm)
 
 # dataframe of continuous columns
 # other numerical variables seem to be counts (some based on per 1000, but still count nonetheless)
-life_exp_2013_tfm_cont <- life_exp_2013[,c('longevity_squared',
+life_exp_2013_tfm_cont <- life_exp_2013[,c('longevity',
                                            'alcohol',
                                            'perc_exp_trnsfrm',
                                            'bmi',
@@ -583,11 +589,11 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(adult_mort_trnsfrm = adult_mort^(1))
 
 # transform the dependent variable
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^1)
+# life_exp_2013 <- life_exp_2013 %>%
+#   mutate(longevity_squared = longevity^1)
 
 # fit the model and the augment
-adult_mort_lm <- lm(longevity_squared ~ adult_mort_trnsfrm, life_exp_2013)
+adult_mort_lm <- lm(longevity ~ adult_mort_trnsfrm, life_exp_2013)
 adult_mort_aug_lm <- augment(adult_mort_lm)
 
 # plot the relevant graphs
@@ -624,7 +630,7 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(longevity_squared = longevity^1)
 
 # fit the model and the augment
-inf_death_lm <- lm(longevity_squared ~ inf_death_trnsfrm, life_exp_2013)
+inf_death_lm <- lm(longevity ~ inf_death_trnsfrm, life_exp_2013)
 inf_death_aug_lm <- augment(inf_death_lm)
 
 # plot the relevant graphs
@@ -657,11 +663,11 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(hep_b_trnsfrm = hep_b^(4))
 
 # transform the dependent variable
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^1)
+# life_exp_2013 <- life_exp_2013 %>%
+#   mutate(longevity_squared = longevity^1)
 
 # fit the model and the augment
-hep_b_lm <- lm(longevity_squared ~ hep_b_trnsfrm, life_exp_2013)
+hep_b_lm <- lm(longevity ~ hep_b_trnsfrm, life_exp_2013)
 hep_b_aug_lm <- augment(hep_b_lm)
 
 # plot the relevant graphs
@@ -694,11 +700,11 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(measles_trnsfrm = measles^(1/4))
 
 # transform the dependent variable
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^1)
+# life_exp_2013 <- life_exp_2013 %>%
+#   mutate(longevity_squared = longevity^1)
 
 # fit the model and the augment
-measles_lm <- lm(longevity_squared ~ measles_trnsfrm, life_exp_2013)
+measles_lm <- lm(longevity ~ measles_trnsfrm, life_exp_2013)
 measles_aug_lm <- augment(measles_lm)
 
 # plot the relevant graphs
@@ -732,11 +738,11 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(u5_deaths_trnsfrm = u5_deaths^(1/2))
 
 # transform the dependent variable
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^1)
+# life_exp_2013 <- life_exp_2013 %>%
+#   mutate(longevity_squared = longevity^1)
 
 # fit the model and the augment
-u5_deaths_lm <- lm(longevity_squared ~ u5_deaths_trnsfrm, life_exp_2013)
+u5_deaths_lm <- lm(longevity ~ u5_deaths_trnsfrm, life_exp_2013)
 u5_deaths_aug_lm <- augment(u5_deaths_lm)
 
 # plot the relevant graphs
@@ -770,11 +776,11 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(polio_trnsfrm = polio^(5))
 
 # transform the dependent variable
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^1)
+# life_exp_2013 <- life_exp_2013 %>%
+#   mutate(longevity_squared = longevity^1)
 
 # fit the model and the augment
-polio_lm <- lm(longevity_squared ~ polio_trnsfrm, life_exp_2013)
+polio_lm <- lm(longevity ~ polio_trnsfrm, life_exp_2013)
 polio_aug_lm <- augment(polio_lm)
 
 # plot the relevant graphs
@@ -807,11 +813,11 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(dipth_trnsfrm = dipth^(6))
 
 # transform the dependent variable
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^1)
+# life_exp_2013 <- life_exp_2013 %>%
+#   mutate(longevity_squared = longevity^1)
 
 # fit the model and the augment
-dipth_lm <- lm(longevity_squared ~ dipth_trnsfrm, life_exp_2013)
+dipth_lm <- lm(longevity ~ dipth_trnsfrm, life_exp_2013)
 dipth_aug_lm <- augment(dipth_lm)
 
 # plot the relevant graphs
@@ -844,11 +850,11 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(pop_trnsfrm = log(pop))
 
 # transform the dependent variable
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^1)
+# life_exp_2013 <- life_exp_2013 %>%
+#   mutate(longevity_squared = longevity^1)
 
 # fit the model and the augment
-pop_lm <- lm(longevity_squared ~ pop_trnsfrm, life_exp_2013)
+pop_lm <- lm(longevity ~ pop_trnsfrm, life_exp_2013)
 pop_aug_lm <- augment(pop_lm)
 
 # plot the relevant graphs

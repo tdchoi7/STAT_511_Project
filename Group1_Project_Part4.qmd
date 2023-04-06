@@ -1,0 +1,151 @@
+---
+title: "Project Part 4"
+subtitle: "STAT 511"
+author: "Moses Sanches, Shuyu Wang, Theodore Choi"
+date: "`r Sys.Date()`"
+format: 
+  html:
+    self-contained: true
+    toc: true
+    toc_float: true
+    number-section: false
+    highlight: tango
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r}
+#| message: false
+# Libraries we used
+library(openintro)
+library(tidyverse)
+library(dplyr)
+library(broom)
+library(ggplot2)
+library(corrplot)
+library(GGally)
+library(glue)
+library(ggpubr)
+library(olsrr)
+library(MASS)
+library(cowplot)
+
+```
+
+
+```{r}
+
+# import data
+filepath_2013 <- "./data/longevity Data Cleaned Version 2013 TFM.rds"
+
+life_exp_2013 <- readRDS(filepath_2013)
+
+# show the top rows of the dataframe
+head(life_exp_2013)
+
+```
+
+
+## Part A – Preliminary Main effects model
+
+### 1. Using the results from project part 3 as a starting point, determine the set of P-1 predictor variables under consideration.
+
+##### a. Make sure all variables have been transformed appropriately, as necessary.
+```{r}
+
+```
+
+##### b. You should combine levels of categorical variables at this step if necessary.
+```{r}
+
+```
+
+### 2. Fit a main effects (no interactions) model with the full set of P-1 predictors
+```{r}
+
+```
+
+### 3. Show the summary table for this “preliminary main effects model”
+```{r}
+
+```
+
+
+## Part B – Model Selection Procedures
+
+### 4. Conduct 2-3 model selection procedures (e.g. “best subsets” algorithm, stepwise forward/backward) to determine a few candidates for a “best” model
+
+##### a. You do not need to include all the output in your report (i.e. use echo = FALSE and eval = FALSE in code chunks as necessary)
+```{r}
+
+
+```
+
+##### b. Report a few models that are candidates for “best” model and discuss their similarities and differences (e.g. what variables get included every time, which variables end up in some models but not others)
+```{r}
+
+```
+
+
+##### c. For any of these “best” models, do any indicator variables need to be added back in? I.e. did only some levels of a categorical variable make it in? Do the categories need to be collapsed or re-leveled in any way? Adapt the models as necessary.
+```{r}
+
+```
+>
+
+### 5. Among the variables deemed important, determine whether you will add any pairwise interactions to the model. This should be based off of substantive knowledge of the data & research question. For each interaction of interest, fit a full model (with the interactions) and the reduced model (without interactions) and conduct an F test to determine whether it should be included.
+
+
+### 6. Based on your results in Step 5 & 6 and substantive knowledge about the dataset, select a preliminary “best” model. Show the summary output for this model and write out the regression equation.
+
+
+
+## Part C – Preliminary summary
+### Provide a brief (1 paragraph) summary of your findings so far. Some things to comment on:
+
+##### • What variables appear to be associated with your outcome of interest?
+> 
+
+##### • How much variation in Y does your set of predictor variables explain?
+> 
+
+##### • Interpret some of the parameters of interest
+> 
+
+```{r}
+# # Exporting Dataset
+# life_exp_2013_fact <- life_exp_2013[,c('continent.f', 'status.f')]
+# 
+# # assign transformed columns to variable
+# life_exp_2013_tfm <- cbind(life_exp_2013_tfm_num, life_exp_2013_fact)
+# 
+# # rearrange data
+# life_exp_2013_tfm <- life_exp_2013_tfm[, c(19, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+#                                            12, 13, 14, 15, 16, 17, 18, 20, 21)]
+# 
+# # output dataframe
+# head(life_exp_2013_tfm)
+# 
+# # assign filepaths to variables
+# filepath_2013_tfm <- "./data/longevity Data Cleaned Version 2013 TFM.rds"
+# 
+# # save to csv
+# saveRDS(life_exp_2013_tfm, filepath_2013_tfm)
+```
+
+
+
+
+
+
+
+
+
