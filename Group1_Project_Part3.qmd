@@ -149,7 +149,7 @@ colnames_lifeexp_cont <- names(life_exp_2013_cont)[-1]
 
 # credit to: https://stackoverflow.com/questions/59161144/creating-a-loop-through-a-list-of-variables-for-an-lm-model-in-r
 # assign list of models to variable
-list_formulas_cont <- lapply(paste("longevity ~", colnames_lifeexp_cont), asormula)
+list_formulas_cont <- lapply(paste("longevity ~", colnames_lifeexp_cont), as.formula)
 
 # apply linear model function to the list of variables
 list_lm_life_exp_cont <- lapply(list_formulas_cont, function(x) lm(x, data = life_exp_2013_cont))
@@ -182,7 +182,7 @@ for (i in my_range)
   # Linearity, Equal Variance
   p1 <- ggplot(data = list_aug_life_exp_cont[[i]],
                aes(y = .resid,
-                   x = itted)) +
+                   x = .fitted)) +
         geom_point() +
         labs(title = glue('Residuals vs Fitted for {colnames_lifeexp_cont[i]}'),
                   x = colnames_lifeexp_cont[i],
@@ -235,7 +235,7 @@ alcohol_aug_lm <- augment(alcohol_lm)
 # plot the relevant graphs
 ggplot(data = alcohol_aug_lm,
              aes(y = .resid,
-                x = itted)) +    
+                x = .fitted)) +    
       geom_point() +
       labs(title = 'Residuals vs alcohol') +
       theme_minimal()
@@ -270,7 +270,7 @@ perc_exp_aug_lm <- augment(perc_exp_lm)
 # plot the relevant graphs
 ggplot(data = perc_exp_aug_lm,
        aes(y = .resid,
-           x = itted)) +    
+           x = .fitted)) +    
   geom_point() +
   labs(title = 'Residuals vs perc_exp') +
   theme_minimal()
@@ -305,7 +305,7 @@ bmi_aug_lm <- augment(bmi_lm)
 # plot the relevant graphs
 ggplot(data = bmi_aug_lm,
                aes(y = .resid,
-                   x = itted)) +    
+                   x = .fitted)) +    
         geom_point() +
         labs(title = 'Residuals vs bmi') +
         theme_minimal()
@@ -340,7 +340,7 @@ tot_exp_aug_lm <- augment(tot_exp_lm)
 # plot the relevant graphs
 ggplot(data = tot_exp_aug_lm,
                aes(y = .resid,
-                   x = itted)) +    
+                   x = .fitted)) +    
         geom_point() +
         labs(title = 'Residuals vs tot_exp') +
         theme_minimal()
@@ -375,7 +375,7 @@ aids_aug_lm <- augment(aids_lm)
 # plot the relevant graphs
 ggplot(data = aids_aug_lm,
                aes(y = .resid,
-                   x = itted)) +    
+                   x = .fitted)) +    
         geom_point() +
         labs(title = 'Residuals vs aids') +
         theme_minimal()
@@ -410,7 +410,7 @@ gdp_aug_lm <- augment(gdp_lm)
 # plot the relevant graphs
 ggplot(data = gdp_aug_lm,
                aes(y = .resid,
-                   x = itted)) +    
+                   x = .fitted)) +    
         geom_point() +
         labs(title = 'Residuals vs gdp') +
         theme_minimal()
@@ -445,7 +445,7 @@ thin_1_19_aug_lm <- augment(thin_1_19_lm)
 # plot the relevant graphs
 ggplot(data = thin_1_19_aug_lm,
                aes(y = .resid,
-                   x = itted)) +    
+                   x = .fitted)) +    
         geom_point() +
         labs(title = 'Residuals vs thin_1_19') +
         theme_minimal()
@@ -480,7 +480,7 @@ thin_5_9_aug_lm <- augment(thin_5_9_lm)
 # plot the relevant graphs
 ggplot(data = thin_5_9_aug_lm,
                aes(y = .resid,
-                   x = itted)) +    
+                   x = .fitted)) +    
         geom_point() +
         labs(title = 'Residuals vs thin_5_9') +
         theme_minimal()
@@ -530,7 +530,7 @@ colnames_lifeexp_disc <- names(life_exp_2013_disc)[-1]
 
 # credit to: https://stackoverflow.com/questions/59161144/creating-a-loop-through-a-list-of-variables-for-an-lm-model-in-r
 # assign list of models to variable
-list_formulas_disc <- lapply(paste("longevity ~", colnames_lifeexp_disc), asormula)
+list_formulas_disc <- lapply(paste("longevity ~", colnames_lifeexp_disc), as.formula)
 
 # apply linear model function to the list of variables
 list_lm_life_exp_disc <- lapply(list_formulas_disc, function(x) lm(x, data = life_exp_2013_disc))
@@ -563,7 +563,7 @@ for (i in my_range)
   # Linearity, Equal Variance
   p1 <- ggplot(data = list_aug_life_exp_disc[[i]],
                aes(y = .resid,
-                   x = itted)) +
+                   x = .fitted)) +
         geom_point() +
         labs(title = glue('Residuals vs Fitted for {colnames_lifeexp_disc[i]}'),
                   x = colnames_lifeexp_disc[i],
@@ -617,7 +617,7 @@ adult_mort_aug_lm <- augment(adult_mort_lm)
 # plot the relevant graphs
 ggplot(data = adult_mort_aug_lm,
              aes(y = .resid,
-                x = itted)) +    
+                x = .fitted)) +    
       geom_point() +
       labs(title = 'Residuals vs adult_mort') +
       theme_minimal()
@@ -656,7 +656,7 @@ inf_death_aug_lm <- augment(inf_death_lm)
 # plot the relevant graphs
 ggplot(data = inf_death_aug_lm,
              aes(y = .resid,
-                x = itted)) +    
+                x = .fitted)) +    
       geom_point() +
       labs(title = 'Residuals vs inf_death') +
       theme_minimal()
@@ -695,7 +695,7 @@ hep_b_aug_lm <- augment(hep_b_lm)
 # plot the relevant graphs
 ggplot(data = hep_b_aug_lm,
              aes(y = .resid,
-                x = itted)) +    
+                x = .fitted)) +    
       geom_point() +
       labs(title = 'Residuals vs hep_b') +
       theme_minimal()
@@ -734,7 +734,7 @@ measles_aug_lm <- augment(measles_lm)
 # plot the relevant graphs
 ggplot(data = measles_aug_lm,
              aes(y = .resid,
-                x = itted)) +    
+                x = .fitted)) +    
       geom_point() +
       labs(title = 'Residuals vs measles') +
       theme_minimal()
@@ -773,7 +773,7 @@ u5_deaths_aug_lm <- augment(u5_deaths_lm)
 # plot the relevant graphs
 ggplot(data = u5_deaths_aug_lm,
              aes(y = .resid,
-                x = itted)) +    
+                x = .fitted)) +    
       geom_point() +
       labs(title = 'Residuals vs u5_deaths') +
       theme_minimal()
@@ -812,7 +812,7 @@ polio_aug_lm <- augment(polio_lm)
 # plot the relevant graphs
 ggplot(data = polio_aug_lm,
              aes(y = .resid,
-                x = itted)) +    
+                x = .fitted)) +    
       geom_point() +
       labs(title = 'Residuals vs polio') +
       theme_minimal()
@@ -851,7 +851,7 @@ dipth_aug_lm <- augment(dipth_lm)
 # plot the relevant graphs
 ggplot(data = dipth_aug_lm,
              aes(y = .resid,
-                x = itted)) +    
+                x = .fitted)) +    
       geom_point() +
       labs(title = 'Residuals vs dipth') +
       theme_minimal()
@@ -890,7 +890,7 @@ pop_aug_lm <- augment(pop_lm)
 # plot the relevant graphs
 ggplot(data = pop_aug_lm,
              aes(y = .resid,
-                x = itted)) +    
+                x = .fitted)) +    
       geom_point() +
       labs(title = 'Residuals vs pop') +
       theme_minimal()
@@ -977,21 +977,21 @@ corr_matrix <- ggpairs(life_exp_2013_num,
 # factorize the categorical variable
 life_exp_2013$country <- factor(life_exp_2013$country)
 # check successful factorization
-isactor(life_exp_2013$country)
+is.factor(life_exp_2013$country)
 ```
 
 ```{r}
 # factorize the categorical variable
 life_exp_2013$continent <- factor(life_exp_2013$continent)
 # check successful factorization
-isactor(life_exp_2013$continent)
+is.factor(life_exp_2013$continent)
 ```
 
 ```{r}
 # factorize the categorical variable
 life_exp_2013$status <- factor(life_exp_2013$status)
 # check successful factorization
-isactor(life_exp_2013$status)
+is.factor(life_exp_2013$status)
 ```
 
 ### b. For EACH categorical predictor separately (one at a time), fit a SLR model
