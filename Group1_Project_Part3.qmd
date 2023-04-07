@@ -507,7 +507,7 @@ boxcox(thin_5_9_lm)
 # dataframe of continuous columns
 # other numerical variables seem to be counts (some based on per 1000, but still count nonetheless)
 life_exp_2013_tfm_cont <- life_exp_2013[,c('longevity',
-                                           'alcohol',
+                                           'alcohol_trnsfrm',
                                            'perc_exp_trnsfrm',
                                            'bmi',
                                            'tot_exp',
