@@ -509,12 +509,12 @@ boxcox(thin_5_9_lm)
 life_exp_2013_tfm_cont <- life_exp_2013[,c('longevity',
                                            'alcohol_trnsfrm',
                                            'perc_exp_trnsfrm',
-                                           'bmi',
-                                           'tot_exp',
+                                           'bmi_trnsfrm',
+                                           'tot_exp_trnsfrm',
                                            'aids_trnsfrm',
                                            'gdp_trnsfrm',
-                                           'thin_1_19',
-                                           'thin_5_9',
+                                           'thin_1_19_trnsfrm',
+                                           'thin_5_9_trnsfrm',
                                            'inc_comp',
                                            'school')]
 
@@ -646,8 +646,8 @@ life_exp_2013 <- life_exp_2013 %>%
   mutate(inf_death_trnsfrm = inf_death^(1/2))
 
 # transform the dependent variable
-life_exp_2013 <- life_exp_2013 %>%
-  mutate(longevity_squared = longevity^1)
+# life_exp_2013 <- life_exp_2013 %>%
+#   mutate(longevity_squared = longevity^1)
 
 # fit the model and the augment
 inf_death_lm <- lm(longevity ~ inf_death_trnsfrm, life_exp_2013)
@@ -916,7 +916,7 @@ boxcox(pop_lm)
 
 # dataframe of continuous columns
 # other numerical variables seem to be counts (some based on per 1000, but still count nonetheless)
-life_exp_2013_tfm_disc <- life_exp_2013[,c('adult_mort_trnsfrm',
+life_exp_2013_tfm_disc <- life_exp_2013[,c('adult_mort',
                                            'inf_death_trnsfrm',
                                            'hep_b_trnsfrm',
                                            'measles_trnsfrm',

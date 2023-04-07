@@ -28,177 +28,146 @@ knitr::opts_chunk$set(echo = TRUE)
 library(openintro)
 library(tidyverse)
 library(dplyr)
-library(broom)
-library(ggplot2)
-library(corrplot)
-library(GGally)
-library(glue)
-library(ggpubr)
-library(olsrr)
-library(MASS)
-library(cowplot)
+library(scales)
 
 ```
-
 
 ```{r}
 
 # import data
 filepath_2013 <- "./data/longevity Data Cleaned Version 2013 TFM.rds"
 
-life_exp_2013 <- readRDS(filepath_2013)
+life_exp_pt4 <- readRDS(filepath_2013)
 
 ```
 
-
-## Part A – Preliminary Main effects model
+## Part A -- Preliminary Main effects model
 
 ### 1. Using the results from project part 3 as a starting point, determine the set of P-1 predictor variables under consideration.
 
 ##### a. Make sure all variables have been transformed appropriately, as necessary.
-```{r}
-head(life_exp_2013[,2:19])
-```
-
+##### b. You should combine levels of categorical variables at this step if necessary.
 
 ```{r}
 
 # show the top rows of the dataframe to show if they include the transformations
-head(life_exp_2013)
+head(life_exp_pt4)
 
-# scaling all numeric data
-# life_exp_2013[,-1] <- life_exp_2013[,-1] %>% mutate(across(where(is.numeric), scale))
+# impute nulls
+# https://stackoverflow.com/questions/20364450/find-names-of-columns-which-contain-missing-values
+cols_w_null <- names(which(colSums(is.na(life_exp_pt4)) > 0))
+my_range <- 1:length(cols_w_null)
 
-# converting necessary columns back to numeric after scaling
-# life_exp_2013[,2:19] <- lapply(life_exp_2013[,2:19], as.numeric)
+# setting NA = -1
+for (i in my_range)
+  {
+  life_exp_pt4[cols_w_null[i]] <-
+    rescale_max(life_exp_pt4[cols_w_null[i]])
+  life_exp_pt4[cols_w_null[i]][is.na(life_exp_pt4[cols_w_null[i]])] <- -1
+  # if setting to median instead:
+  #   life_exp_pt4[cols_w_null[i]][is.na(life_exp_pt4[cols_w_null[i]])] <-
+#     median(life_exp_pt4[cols_w_null[i]], na.rm = TRUE)
+  }
 
-# check if transformations held
-sapply(life_exp_2013, class)
-
-levels(life_exp_2013$continent)
-levels(life_exp_2013$status)
-
-
-# fitting the model
-# lm_le_2013 <- lm(life_exp_2013_response ~ scale(alcohol) +
-#                                           scale(perc_exp_trnsfrm) +
-#                                           scale(bmi) +
-#                                           scale(tot_exp) +
-#                                           scale(aids_trnsfrm) +
-#                                           scale(gdp_trnsfrm) +
-#                                           scale(thin_1_19) +
-#                                           scale(thin_5_9) +
-#                                           scale(inc_comp) +
-#                                           scale(school) +
-#                                           scale(adult_mort_trnsfrm) +
-#                                           scale(inf_death_trnsfrm) +
-#                                           scale(hep_b_trnsfrm) +
-#                                           scale(measles_trnsfrm) +
-#                                           scale(u5_deaths_trnsfrm) +
-#                                           scale(polio_trnsfrm) +
-#                                           scale(dipth_trnsfrm) +
-#                                           scale(pop_trnsfrm) +
-#                                           continent + status, data = life_exp_2013)
-
-# fitting the model
-# lm_le_2013 <- lm(life_exp_2013_response ~ continent + status, data = life_exp_2013)
-
-# checking model
-# summary(lm_life_exp)
+# check if columns contain any null values - sum should be 0 if no nulls
+# https://www.geeksforgeeks.org/how-to-check-missing-values-in-r-dataframe/
+sum(is.na(life_exp_pt4)) #{next}
 
 ```
-
-##### b. You should combine levels of categorical variables at this step if necessary.
-```{r}
-
-
-
-```
-
-
-```{r}
-
-```
-
 
 ### 2. Fit a main effects (no interactions) model with the full set of P-1 predictors
+
 ```{r}
+# fitting the full model
+lm_lfexp_pt4 <- lm(life_exp_2013_response ~ alcohol_trnsfrm +
+                                          perc_exp_trnsfrm +
+                                          bmi_trnsfrm +
+                                          tot_exp_trnsfrm +
+                                          aids_trnsfrm +
+                                          gdp_trnsfrm +
+                                          thin_1_19_trnsfrm +
+                                          thin_5_9_trnsfrm +
+                                          inc_comp +
+                                          school +
+                                          adult_mort +
+                                          inf_death_trnsfrm +
+                                          hep_b_trnsfrm +
+                                          measles_trnsfrm +
+                                          u5_deaths_trnsfrm +
+                                          polio_trnsfrm +
+                                          dipth_trnsfrm +
+                                          pop_trnsfrm +
+                                          continent + status,
+                 data = life_exp_pt4)
+
+
 
 ```
 
-### 3. Show the summary table for this “preliminary main effects model”
+
+### 3. Show the summary table for this "preliminary main effects model"
+
 ```{r}
+
+# checking model
+summary(lm_lfexp_pt4)
 
 ```
 
+## Part B -- Model Selection Procedures
 
-## Part B – Model Selection Procedures
-
-### 4. Conduct 2-3 model selection procedures (e.g. “best subsets” algorithm, stepwise forward/backward) to determine a few candidates for a “best” model
+### 4. Conduct 2-3 model selection procedures (e.g. "best subsets" algorithm, stepwise forward/backward) to determine a few candidates for a "best" model
 
 ##### a. You do not need to include all the output in your report (i.e. use echo = FALSE and eval = FALSE in code chunks as necessary)
+
 ```{r}
 
 
 ```
 
-##### b. Report a few models that are candidates for “best” model and discuss their similarities and differences (e.g. what variables get included every time, which variables end up in some models but not others)
+##### b. Report a few models that are candidates for "best" model and discuss their similarities and differences (e.g. what variables get included every time, which variables end up in some models but not others)
+
 ```{r}
 
 ```
 
+##### c. For any of these "best" models, do any indicator variables need to be added back in? I.e. did only some levels of a categorical variable make it in? Do the categories need to be collapsed or re-leveled in any way? Adapt the models as necessary.
 
-##### c. For any of these “best” models, do any indicator variables need to be added back in? I.e. did only some levels of a categorical variable make it in? Do the categories need to be collapsed or re-leveled in any way? Adapt the models as necessary.
 ```{r}
 
 ```
->
 
 ### 5. Among the variables deemed important, determine whether you will add any pairwise interactions to the model. This should be based off of substantive knowledge of the data & research question. For each interaction of interest, fit a full model (with the interactions) and the reduced model (without interactions) and conduct an F test to determine whether it should be included.
 
+### 6. Based on your results in Step 5 & 6 and substantive knowledge about the dataset, select a preliminary "best" model. Show the summary output for this model and write out the regression equation.
 
-### 6. Based on your results in Step 5 & 6 and substantive knowledge about the dataset, select a preliminary “best” model. Show the summary output for this model and write out the regression equation.
+## Part C -- Preliminary summary
 
-
-
-## Part C – Preliminary summary
 ### Provide a brief (1 paragraph) summary of your findings so far. Some things to comment on:
 
 ##### • What variables appear to be associated with your outcome of interest?
-> 
 
 ##### • How much variation in Y does your set of predictor variables explain?
-> 
 
 ##### • Interpret some of the parameters of interest
-> 
 
 ```{r}
 # # Exporting Dataset
-# life_exp_2013_fact <- life_exp_2013[,c('continent.f', 'status.f')]
+# life_exp_pt4_fact <- life_exp_pt4[,c('continent.f', 'status.f')]
 # 
 # # assign transformed columns to variable
-# life_exp_2013_tfm <- cbind(life_exp_2013_tfm_num, life_exp_2013_fact)
+# life_exp_pt4_tfm <- cbind(life_exp_pt4_tfm_num, life_exp_pt4_fact)
 # 
 # # rearrange data
-# life_exp_2013_tfm <- life_exp_2013_tfm[, c(19, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+# life_exp_pt4_tfm <- life_exp_pt4_tfm[, c(19, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 #                                            12, 13, 14, 15, 16, 17, 18, 20, 21)]
 # 
 # # output dataframe
-# head(life_exp_2013_tfm)
+# head(life_exp_pt4_tfm)
 # 
 # # assign filepaths to variables
 # filepath_2013_tfm <- "./data/longevity Data Cleaned Version 2013 TFM.rds"
 # 
 # # save to csv
-# saveRDS(life_exp_2013_tfm, filepath_2013_tfm)
+# saveRDS(life_exp_pt4_tfm, filepath_2013_tfm)
 ```
-
-
-
-
-
-
-
-
-
