@@ -100,8 +100,6 @@ lm_lfexp_pt4 <- lm(life_exp_2013_response ~ alcohol_trnsfrm +
                                           continent + status,
                  data = life_exp_pt4)
 
-
-
 ```
 
 
