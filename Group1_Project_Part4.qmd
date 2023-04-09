@@ -42,25 +42,13 @@ filepath_2013 <- "./data/longevity Data Cleaned Version 2013 TFM.rds"
 
 life_exp_pt4 <- readRDS(filepath_2013)
 
-head(life_exp_pt4)
-
 ```
 
 ## Part A -- Preliminary Main effects model
 
 ### 1. Using the results from project part 3 as a starting point, determine the set of P-1 predictor variables under consideration.
 
-```{r}
-
-# find why alcohol has dense area in plot:
-# count values
-table(life_exp_pt4$alcohol_trnsfrm)[1]
-
-```
-> Based on examination of the alcohol, we can conclude that many countries reported 0.1 liters of pure alcohol consumed per capita
-
 ##### a. Make sure all variables have been transformed appropriately, as necessary.
-
 ##### b. You should combine levels of categorical variables at this step if necessary.
 
 ```{r}
@@ -90,82 +78,6 @@ sum(is.na(life_exp_pt4)) #{next}
 
 ```
 
-> From part 3: 
-> It seems that Income Composition of Resources (Corr: 0.891) and Schooling (Corr: 0.795) are most related to the response. HIV AIDS (Corr: -0.622) also seems to be related to the response
-> Thinness of Ages 1 to 19 and Thinness of Ages 5 to 9 seem to be quite correlated/possibly colinear (Corr: 0.925). Income Composition of Resources and Schooling also seem to be correlated/possibly colinear (Corr: 0.913). Percent Expenditure on Health as a Percentage of GDP and GDP also seem highly correlated/possibly colinear (Corr: 0.918).
-> Infant Deaths and Under 5 Deaths seem to be quite correlated/possibly colinear (Corr: 0.997). Hepatitis B and Diptheria also seem to be correlated/possibly colinear (Corr: 0.711)
-
-```{r}
-
-# check for interactions
-# compare thinness 1-19 to thinness 5-9
-lm_thin_1 <- lm(life_exp_2013_response ~ thin_1_19_trnsfrm + thin_5_9_trnsfrm, data = life_exp_pt4)
-
-summary(lm_thin_1)
-anova(lm_thin_1)
-
-lm_thin_2 <- lm(life_exp_2013_response ~ thin_5_9_trnsfrm + thin_1_19_trnsfrm, data = life_exp_pt4)
-
-summary(lm_thin_2)
-anova(lm_thin_2)
-
-# to check if we should drop one of the thinness columns
-lm_thin_59 <- lm(life_exp_2013_response ~ thin_5_9_trnsfrm, data = life_exp_pt4)
-
-# checking reduced to full model
-anova(lm_thin_59, lm_thin_2)
-
-lm_thin_119 <- lm(life_exp_2013_response ~ thin_1_19_trnsfrm, data = life_exp_pt4)
-
-# checking reduced to full model
-anova(lm_thin_119, lm_thin_1)
-
-
-
-# compare schooling and income composition
-lm_incsch_1 <- lm(life_exp_2013_response ~ inc_comp + school, data = life_exp_pt4)
-
-summary(lm_incsch_1)
-anova(lm_incsch_1)
-
-lm_incsch_2 <- lm(life_exp_2013_response ~ school + inc_comp, data = life_exp_pt4)
-
-summary(lm_incsch_2)
-anova(lm_incsch_2)
-
-# to check if we should drop school or inc_comp
-lm_inc <- lm(life_exp_2013_response ~ inc_comp, data = life_exp_pt4)
-
-anova(lm_inc, lm_incsch_1)
-
-lm_school <- lm(life_exp_2013_response ~ school, data = life_exp_pt4)
-
-anova(lm_school, lm_incsch_2)
-
-
-
-# compare perc_exp and gdp
-lm_percgdp_1 <- lm(life_exp_2013_response ~ perc_exp_trnsfrm + gdp_trnsfrm, data = life_exp_pt4)
-
-summary(lm_percgdp_1)
-anova(lm_percgdp_1)
-
-lm_percgdp_2 <- lm(life_exp_2013_response ~ gdp_trnsfrm +  perc_exp_trnsfrm, data = life_exp_pt4)
-
-summary(lm_percgdp_2)
-anova(lm_percgdp_2)
-
-# check which column to drop
-lm_percexp <- lm(life_exp_2013_response ~ perc_exp_trnsfrm, data = life_exp_pt4)
-
-anova(lm_percexp, lm_percgdp_1)
-
-lm_gdp <- lm(life_exp_2013_response ~ gdp_trnsfrm, data = life_exp_pt4)
-
-anova(lm_gdp, lm_percgdp_2)
-
-```
-> thin_1_19_trnsfrm and  can be dropped from the model
 ### 2. Fit a main effects (no interactions) model with the full set of P-1 predictors
 
 ```{r}
@@ -193,6 +105,7 @@ lm_lfexp_pt4 <- lm(life_exp_2013_response ~ alcohol_trnsfrm +
 
 ```
 
+
 ### 3. Show the summary table for this "preliminary main effects model"
 
 ```{r}
@@ -210,12 +123,12 @@ summary(lm_lfexp_pt4)
 
 ```{r}
 # Stepwise Forward Regression
-model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
-ols_step_forward_p(model)
+Forward_model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
+ols_step_forward_p(Forward_model)
 
 # Stepwise Backward Regression
-model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
-ols_step_backward_p(model)
+Back_model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
+ols_step_backward_p(Back_model)
 
 # Best Subset Regression
 models <- regsubsets(life_exp_2013_response~., data = life_exp_pt4, nvmax = 5)
@@ -224,13 +137,45 @@ summary(models)
 
 ##### b. Report a few models that are candidates for "best" model and discuss their similarities and differences (e.g. what variables get included every time, which variables end up in some models but not others)
 
-> From the stepwise foward and backward regression model as well as the best subset regression model, the adult mortality and adult trnsfrm variables are the only ones present in the three models constructed. This is good indication that they will be included to construct the best model. Variables tot_exp_trnsfrm, thin_5\_9_trnsfrm, and measles_trnsfrm were some that probably wont be used to decide the best model. This is due to them not being in all three models and they were eliminated in the backwards refression model.
+> From the stepwise foward and backward regression model as well as the best subset regression model, the adult mortality and alcohol trnsfrm variables are the only ones present in the three models constructed. This is good indication that they will be included to construct the best model. Variables tot_exp_trnsfrm, thin_5_9_trnsfrm, and measles_trnsfrm were some that probably wont be used to decide the best model. This is due to them not being in all three models and they were eliminated in the backwards refression model. 
 
 ##### c. For any of these "best" models, do any indicator variables need to be added back in? I.e. did only some levels of a categorical variable make it in? Do the categories need to be collapsed or re-leveled in any way? Adapt the models as necessary.
 
 > After looking at the models, it doesnt look like any indicator variables need to be added in or adjusted, since no catergorical variable levels are missing.
 
 ### 5. Among the variables deemed important, determine whether you will add any pairwise interactions to the model. This should be based off of substantive knowledge of the data & research question. For each interaction of interest, fit a full model (with the interactions) and the reduced model (without interactions) and conduct an F test to determine whether it should be included.
+
+> The adult mortality and alcohol trnsfrm variables will be a possible pairwise interaction since they are present in most of the data and have high R2 values.
+
+```{r}
+# Full Model
+lm_lfexp_pt4 <- lm(life_exp_2013_response ~ alcohol_trnsfrm +
+                                          perc_exp_trnsfrm +
+                                          bmi_trnsfrm +
+                                          tot_exp_trnsfrm +
+                                          aids_trnsfrm +
+                                          gdp_trnsfrm +
+                                          thin_1_19_trnsfrm +
+                                          thin_5_9_trnsfrm +
+                                          inc_comp +
+                                          school +
+                                          adult_mort +
+                                          inf_death_trnsfrm +
+                                          hep_b_trnsfrm +
+                                          measles_trnsfrm +
+                                          u5_deaths_trnsfrm +
+                                          polio_trnsfrm +
+                                          dipth_trnsfrm +
+                                          pop_trnsfrm +
+                                          continent + status,
+                 data = life_exp_pt4)
+
+# Reduced Model
+Reduced <- lm(life_exp_2013_response ~ adult_mort*alcohol_trnsfrm, data = life_exp_pt4)
+
+anova(Reduced,lm_lfexp_pt4)
+```
+> Since the F statistic (9.7) is greater than the p-value(<2.2e-16), adult mortality and alcohol trnsfrn shouldn't be included to the model.
 
 ### 6. Based on your results in Step 5 & 6 and substantive knowledge about the dataset, select a preliminary "best" model. Show the summary output for this model and write out the regression equation.
 
