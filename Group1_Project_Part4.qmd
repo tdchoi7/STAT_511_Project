@@ -24,13 +24,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 #| message: false
+#| warning: false
 # Libraries we used
 library(openintro)
 library(tidyverse)
 library(dplyr)
 library(scales)
-library(MASS)
-library(caret)
 library(leaps)
 library(olsrr)
 ```
@@ -57,6 +56,7 @@ head(life_exp_pt4)
 table(life_exp_pt4$alcohol_trnsfrm)[1]
 
 ```
+
 > Based on examination of the alcohol, we can conclude that many countries reported 0.1 liters of pure alcohol consumed per capita
 
 ##### a. Make sure all variables have been transformed appropriately, as necessary.
@@ -90,10 +90,7 @@ sum(is.na(life_exp_pt4)) #{next}
 
 ```
 
-> From part 3: 
-> It seems that Income Composition of Resources (Corr: 0.891) and Schooling (Corr: 0.795) are most related to the response. HIV AIDS (Corr: -0.622) also seems to be related to the response
-> Thinness of Ages 1 to 19 and Thinness of Ages 5 to 9 seem to be quite correlated/possibly colinear (Corr: 0.925). Income Composition of Resources and Schooling also seem to be correlated/possibly colinear (Corr: 0.913). Percent Expenditure on Health as a Percentage of GDP and GDP also seem highly correlated/possibly colinear (Corr: 0.918).
-> Infant Deaths and Under 5 Deaths seem to be quite correlated/possibly colinear (Corr: 0.997). Hepatitis B and Diptheria also seem to be correlated/possibly colinear (Corr: 0.711)
+> From part 3: Thinness of Ages 1 to 19 and Thinness of Ages 5 to 9 seem to be quite correlated/possibly colinear (Corr: 0.925). Income Composition of Resources and Schooling also seem to be correlated/possibly colinear (Corr: 0.913). Percent Expenditure on Health as a Percentage of GDP and GDP also seem highly correlated/possibly colinear (Corr: 0.918). Infant Deaths and Under 5 Deaths seem to be quite correlated/possibly colinear (Corr: 0.997). Hepatitis B and Diptheria also seem to be correlated/possibly colinear (Corr: 0.711)
 
 ```{r}
 
@@ -164,32 +161,62 @@ lm_gdp <- lm(life_exp_2013_response ~ gdp_trnsfrm, data = life_exp_pt4)
 
 anova(lm_gdp, lm_percgdp_2)
 
+
+# compare infant deaths and under 5 deaths
+lm_ifu5_1 <- lm(life_exp_2013_response ~ inf_death_trnsfrm + u5_deaths_trnsfrm, data = life_exp_pt4)
+
+summary(lm_ifu5_1)
+anova(lm_ifu5_1)
+
+lm_ifu5_2 <- lm(life_exp_2013_response ~ u5_deaths_trnsfrm + inf_death_trnsfrm, data = life_exp_pt4)
+
+summary(lm_ifu5_2)
+anova(lm_ifu5_2)
+
+# check which column to drop
+lm_inf <- lm(life_exp_2013_response ~ inf_death_trnsfrm, data = life_exp_pt4)
+
+anova(lm_inf, lm_ifu5_1)
+
+lm_u5 <- lm(life_exp_2013_response ~ u5_deaths_trnsfrm, data = life_exp_pt4)
+
+anova(lm_u5, lm_ifu5_2)
+
+
+# compare hep b and diptheria
+lm_hepbdipth_1 <- lm(life_exp_2013_response ~ hep_b_trnsfrm + dipth_trnsfrm, data = life_exp_pt4)
+
+summary(lm_hepbdipth_1)
+anova(lm_hepbdipth_1)
+
+lm_hepbdipth_2 <- lm(life_exp_2013_response ~ dipth_trnsfrm + hep_b_trnsfrm, data = life_exp_pt4)
+
+summary(lm_hepbdipth_2)
+anova(lm_hepbdipth_2)
+
+# check which column to drop
+lm_hepb <- lm(life_exp_2013_response ~ hep_b_trnsfrm, data = life_exp_pt4)
+
+anova(lm_hepb, lm_hepbdipth_1)
+
+lm_dipth <- lm(life_exp_2013_response ~ dipth_trnsfrm, data = life_exp_pt4)
+
+anova(lm_dipth, lm_hepbdipth_2)
+
 ```
-> thin_1_19_trnsfrm and  can be dropped from the model
+
+> thin_1_19_trnsfrm and  can be dropped from the model as it is the only one that had a high p-value
+
 ### 2. Fit a main effects (no interactions) model with the full set of P-1 predictors
 
 ```{r}
+
+# drop columns
+life_exp_pt4 <- life_exp_pt4[-8]
+
 # fitting the full model
-lm_lfexp_pt4 <- lm(life_exp_2013_response ~ alcohol_trnsfrm +
-                                            perc_exp_trnsfrm +
-                                            bmi_trnsfrm +
-                                            tot_exp_trnsfrm +
-                                            aids_trnsfrm +
-                                            gdp_trnsfrm +
-                                            thin_1_19_trnsfrm +
-                                            thin_5_9_trnsfrm +
-                                            inc_comp +
-                                            school +
-                                            adult_mort +
-                                            inf_death_trnsfrm +
-                                            hep_b_trnsfrm +
-                                            measles_trnsfrm +
-                                            u5_deaths_trnsfrm +
-                                            polio_trnsfrm +
-                                            dipth_trnsfrm +
-                                            pop_trnsfrm +
-                                            continent + status,
-                  data = life_exp_pt4)
+lm_lfexp_pt4 <- lm(life_exp_2013_response ~ .,
+                   data = life_exp_pt4)
 
 ```
 
@@ -210,12 +237,12 @@ summary(lm_lfexp_pt4)
 
 ```{r}
 # Stepwise Forward Regression
-model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
-ols_step_forward_p(model)
+# model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
+ols_step_forward_p(lm_lfexp_pt4)
 
 # Stepwise Backward Regression
-model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
-ols_step_backward_p(model)
+# model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
+ols_step_backward_p(lm_lfexp_pt4)
 
 # Best Subset Regression
 models <- regsubsets(life_exp_2013_response~., data = life_exp_pt4, nvmax = 5)
