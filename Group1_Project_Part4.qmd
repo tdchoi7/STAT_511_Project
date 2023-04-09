@@ -294,6 +294,9 @@ anova(inf_death_trnsfrm_red,FullModel)
 
 ### 6. Based on your results in Step 5 & 6 and substantive knowledge about the dataset, select a preliminary "best" model. Show the summary output for this model and write out the regression equation.
 
+m1 <- lm(life_exp_2013_response ~ adult_mort + alcohol_trnsfrm, data = life_exp_2013_response)
+summary(m1)
+
 ## Part C -- Preliminary summary
 
 ### Provide a brief (1 paragraph) summary of your findings so far. Some things to comment on:
@@ -303,6 +306,8 @@ anova(inf_death_trnsfrm_red,FullModel)
 ##### • How much variation in Y does your set of predictor variables explain?
 
 ##### • Interpret some of the parameters of interest
+
+According to our regression models, adult mortality and alcohol trnsfrm variables are the variables that are most asscociated with out outcome of interest. It makes sense that adult mortality will affect life expectancy since we probably don't have the real feeling about death by seeing illness but the rate of death of the people who is similar with us. It is easier for infants and kids to get sick or even death, we probably don't feel that much since we think they are more fragile. It's interesting that alcohol will affect people's life expectancy since usually we use alcohol to eliminate melancholy, but it seems different from the models we get.
 
 ```{r}
 # # Exporting Dataset
