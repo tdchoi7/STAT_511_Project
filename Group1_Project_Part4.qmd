@@ -29,7 +29,10 @@ library(openintro)
 library(tidyverse)
 library(dplyr)
 library(scales)
-
+library(MASS)
+library(caret)
+library(leaps)
+library(olsrr)
 ```
 
 ```{r}
@@ -119,21 +122,26 @@ summary(lm_lfexp_pt4)
 ##### a. You do not need to include all the output in your report (i.e. use echo = FALSE and eval = FALSE in code chunks as necessary)
 
 ```{r}
+# Stepwise Forward Regression
+model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
+ols_step_forward_p(model)
 
+# Stepwise Backward Regression
+model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
+ols_step_backward_p(model)
 
+# Best Subset Regression
+models <- regsubsets(life_exp_2013_response~., data = life_exp_pt4, nvmax = 5)
+summary(models)
 ```
 
 ##### b. Report a few models that are candidates for "best" model and discuss their similarities and differences (e.g. what variables get included every time, which variables end up in some models but not others)
 
-```{r}
-
-```
+> From the stepwise foward and backward regression model as well as the best subset regression model, the adult mortality and adult trnsfrm variables are the only ones present in the three models constructed. This is good indication that they will be included to construct the best model. Variables tot_exp_trnsfrm, thin_5_9_trnsfrm, and measles_trnsfrm were some that probably wont be used to decide the best model. This is due to them not being in all three models and they were eliminated in the backwards refression model. 
 
 ##### c. For any of these "best" models, do any indicator variables need to be added back in? I.e. did only some levels of a categorical variable make it in? Do the categories need to be collapsed or re-leveled in any way? Adapt the models as necessary.
 
-```{r}
-
-```
+> After looking at the models, it doesnt look like any indicator variables need to be added in or adjusted, since no catergorical variable levels are missing.
 
 ### 5. Among the variables deemed important, determine whether you will add any pairwise interactions to the model. This should be based off of substantive knowledge of the data & research question. For each interaction of interest, fit a full model (with the interactions) and the reduced model (without interactions) and conduct an F test to determine whether it should be included.
 
