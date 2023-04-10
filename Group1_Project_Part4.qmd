@@ -31,6 +31,7 @@ library(tidyverse)
 library(dplyr)
 library(scales)
 library(leaps)
+library(MASS)
 library(olsrr)
 ```
 
@@ -41,14 +42,16 @@ filepath_2013 <- "./data/longevity Data Cleaned Version 2013 TFM.rds"
 
 life_exp_pt4 <- readRDS(filepath_2013)
 
+# show top rows
 head(life_exp_pt4)
+
+# life_exp_pt4[,2:21]
 
 ```
 
 ## Part A -- Preliminary Main effects model
 
 ### 1. Using the results from project part 3 as a starting point, determine the set of P-1 predictor variables under consideration.
-
 ```{r}
 
 # find why alcohol has dense area in plot:
@@ -56,28 +59,51 @@ head(life_exp_pt4)
 table(life_exp_pt4$alcohol_trnsfrm)[1]
 
 ```
-
 > Based on examination of the alcohol, we can conclude that many countries reported 0.1 liters of pure alcohol consumed per capita
 
 ##### a. Make sure all variables have been transformed appropriately, as necessary.
-
 ##### b. You should combine levels of categorical variables at this step if necessary.
 
 ```{r}
+# show unique values of columns
+unique(life_exp_pt4$status)
+unique(life_exp_pt4$continent)
 
-# show the top rows of the dataframe to show if they include the transformations
+# convert dummy variables within dataset
+# https://statisticsglobe.com/convert-factor-to-dummy-variables-in-r
+life_exp_pt4 <- data.frame(life_exp_pt4[ , ! colnames(life_exp_pt4) %in% "continent"],
+                           model.matrix( ~ continent - 1, life_exp_pt4))
+
+life_exp_pt4 <- data.frame(life_exp_pt4[ , ! colnames(life_exp_pt4) %in% "status"],
+                           model.matrix( ~ status - 1, life_exp_pt4))
+
+# remove first columns of the dummified factor variables
+life_exp_pt4 <- life_exp_pt4[-25]
+life_exp_pt4 <- life_exp_pt4[-20]
+
+# check results
 head(life_exp_pt4)
+```
+
+
+
+```{r}
 
 # impute nulls
 # https://stackoverflow.com/questions/20364450/find-names-of-columns-which-contain-missing-values
 cols_w_null <- names(which(colSums(is.na(life_exp_pt4)) > 0))
-my_range <- 1:length(cols_w_null)
+null_range <- 1:length(cols_w_null)
+my_range <- 1:length(life_exp_pt4)
 
 # setting NA = -1
 for (i in my_range)
   {
-  life_exp_pt4[cols_w_null[i]] <-
-    rescale_max(life_exp_pt4[cols_w_null[i]])
+  life_exp_pt4[i] <-
+    rescale_max(life_exp_pt4[i])
+}
+
+for (i in null_range)
+  {
   life_exp_pt4[cols_w_null[i]][is.na(life_exp_pt4[cols_w_null[i]])] <- -1
   # if setting to median instead:
   #   life_exp_pt4[cols_w_null[i]][is.na(life_exp_pt4[cols_w_null[i]])] <-
@@ -86,10 +112,9 @@ for (i in my_range)
 
 # check if columns contain any null values - sum should be 0 if no nulls
 # https://www.geeksforgeeks.org/how-to-check-missing-values-in-r-dataframe/
-sum(is.na(life_exp_pt4)) #{next}
+sum(is.na(life_exp_pt4)) 
 
 ```
-
 > From part 3: Thinness of Ages 1 to 19 and Thinness of Ages 5 to 9 seem to be quite correlated/possibly colinear (Corr: 0.925). Income Composition of Resources and Schooling also seem to be correlated/possibly colinear (Corr: 0.913). Percent Expenditure on Health as a Percentage of GDP and GDP also seem highly correlated/possibly colinear (Corr: 0.918). Infant Deaths and Under 5 Deaths seem to be quite correlated/possibly colinear (Corr: 0.997). Hepatitis B and Diptheria also seem to be correlated/possibly colinear (Corr: 0.711)
 
 ```{r}
@@ -204,28 +229,26 @@ lm_dipth <- lm(life_exp_2013_response ~ dipth_trnsfrm, data = life_exp_pt4)
 anova(lm_dipth, lm_hepbdipth_2)
 
 ```
+> thin_1_19_trnsfrm and can be dropped from the model as it is the only one that had a high p-value
 
-> thin_1_19_trnsfrm and  can be dropped from the model as it is the only one that had a high p-value
 
 ### 2. Fit a main effects (no interactions) model with the full set of P-1 predictors
-
 ```{r}
 
-# drop columns
+# drop thin_1_19_trnsfrm column
 life_exp_pt4 <- life_exp_pt4[-8]
 
 # fitting the full model
-lm_lfexp_pt4 <- lm(life_exp_2013_response ~ .,
+FullModel <- lm(life_exp_2013_response ~ .,
                    data = life_exp_pt4)
 
 ```
 
 ### 3. Show the summary table for this "preliminary main effects model"
-
 ```{r}
 
 # checking model
-summary(lm_lfexp_pt4)
+summary(FullModel)
 
 ```
 
@@ -234,22 +257,23 @@ summary(lm_lfexp_pt4)
 ### 4. Conduct 2-3 model selection procedures (e.g. "best subsets" algorithm, stepwise forward/backward) to determine a few candidates for a "best" model
 
 ##### a. You do not need to include all the output in your report (i.e. use echo = FALSE and eval = FALSE in code chunks as necessary)
-
 ```{r}
+#| echo: false
+
 # Stepwise Forward Regression
 # model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
-ols_step_forward_p(lm_lfexp_pt4)
+ols_step_forward_p(FullModel)
 
 # Stepwise Backward Regression
 # model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
-ols_step_backward_p(lm_lfexp_pt4)
+ols_step_backward_p(FullModel)
 
 # Best Subset Regression
-Cp_best <- leaps(x = life_exp_pt4, y = life_exp_pt4$life_exp_2013_response,
+Cp_best <- leaps(x = life_exp_pt4[,2:21], y = life_exp_pt4$life_exp_2013_response,
              method = "Cp", nbest = 1)
 
-Cp_best <- data.frame(Cp_best$which, 
-                      num_in_model = Cp_best$size - 1, 
+Cp_best <- data.frame(Cp_best$which,
+                      num_in_model = Cp_best$size - 1,
                       p = Cp_best$size,
                           Cp = Cp_best$Cp)
 Cp_best
@@ -258,21 +282,18 @@ ggplot(Cp_best, aes(x = num_in_model, y = Cp)) +
   geom_point() +
   theme_minimal()
   
-regfit.full <- regsubsets(life_exp_2013_response ~ ., data = life_exp_pt4)
-plot(regfit.full, scale = "Cp")
+# regfit.full <- regsubsets(life_exp_2013_response ~ ., data = life_exp_pt4)
+# plot(regfit.full, scale = "Cp")
 ```
 
 ##### b. Report a few models that are candidates for "best" model and discuss their similarities and differences (e.g. what variables get included every time, which variables end up in some models but not others)
-
-> From the stepwise foward and backward regression model as well as the best subset regression model, the adult mortality and alcohol trnsfrm variables are the only ones present in the three models constructed. This is good indication that they will be included to construct the best model. Variables tot_exp_trnsfrm, thin_5\_9_trnsfrm, and measles_trnsfrm were some that probably wont be used to decide the best model. This is due to them not being in all three models and they were eliminated in the backwards refression model.
+> From the stepwise foward and backward regression model as well as the best subset regression model, the adult mortality and alcohol trnsfrm variables are the only ones present in the three models constructed. This is good indication that they will be included to construct the best model. Variables tot_exp_trnsfrm, thin_5_9_trnsfrm, and measles_trnsfrm were some that probably wont be used to decide the best model. This is due to them not being in all three models and they were eliminated in the backwards refression model. According to the Cp Best model, we will most likely choose from row 11 or 12 as those have a Cp close to the number of variables while having a relatively low number of variables used in the model
 
 ##### c. For any of these "best" models, do any indicator variables need to be added back in? I.e. did only some levels of a categorical variable make it in? Do the categories need to be collapsed or re-leveled in any way? Adapt the models as necessary.
-
-> After looking at the models, it doesnt look like any indicator variables need to be added in or adjusted, since no catergorical variable levels are missing.
+> After looking at the models, it doesnt look like any indicator variables need to be added in or adjusted, since no catergorical variable levels are missing. Releveling would not do much as the only ordered categorical variable was the status column, but that column only had 2 options (developed, developing)
 
 ### 5. Among the variables deemed important, determine whether you will add any pairwise interactions to the model. This should be based off of substantive knowledge of the data & research question. For each interaction of interest, fit a full model (with the interactions) and the reduced model (without interactions) and conduct an F test to determine whether it should be included.
-
-> Doesn't look like we will be doing pairwise interactions, since there doesnt seem to be variables correlated to each other. 
+> Doesn't look like we will be doing pairwise interactions, since there doesnt seem to be variables correlated to each other.
 
 ```{r}
 # Full/Reduced Models
@@ -280,23 +301,25 @@ adult_mort_red <- lm(life_exp_2013_response ~ adult_mort, data = life_exp_pt4)
 
 inf_death_trnsfrm_red <- lm(life_exp_2013_response ~ inf_death_trnsfrm, data = life_exp_pt4)
 
-FullModel <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
+# FullModel <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
 
-adult_mort_red
-inf_death_trnsfrm_red
-FullModel
+# adult_mort_red
+# inf_death_trnsfrm_red
+# FullModel
 
-
-anova(adult_mort_red,FullModel)
+anova(adult_mort_red, FullModel)
 anova(inf_death_trnsfrm_red,FullModel)
 ```
-> Since the F statistics is greater than the p value, we will not be adding adult mortality or infant deaths to the model.
+> Since the F statistic is greater than the p value, we will not be adding adult mortality or infant deaths to the model.
 
 ### 6. Based on your results in Step 5 & 6 and substantive knowledge about the dataset, select a preliminary "best" model. Show the summary output for this model and write out the regression equation.
+```{r}
 
-m1 <- lm(life_exp_2013_response ~ adult_mort + alcohol_trnsfrm, data = life_exp_2013_response)
+m1 <- lm(life_exp_2013_response ~ adult_mort + alcohol_trnsfrm, data = life_exp_pt4)
+
 summary(m1)
 
+```
 ## Part C -- Preliminary summary
 
 ### Provide a brief (1 paragraph) summary of your findings so far. Some things to comment on:
@@ -306,8 +329,7 @@ summary(m1)
 ##### • How much variation in Y does your set of predictor variables explain?
 
 ##### • Interpret some of the parameters of interest
-
-According to our regression models, adult mortality and alcohol trnsfrm variables are the variables that are most asscociated with out outcome of interest. It makes sense that adult mortality will affect life expectancy since we probably don't have the real feeling about death by seeing illness but the rate of death of the people who is similar with us. It is easier for infants and kids to get sick or even death, we probably don't feel that much since we think they are more fragile. It's interesting that alcohol will affect people's life expectancy since usually we use alcohol to eliminate melancholy, but it seems different from the models we get.
+> According to our regression models, adult mortality and alcohol trnsfrm variables are the variables that are most asscociated with out outcome of interest. It makes sense that adult mortality will affect life expectancy since we probably don't have the real feeling about death by seeing illness but the rate of death of the people who is similar with us. It is easier for infants and kids to get sick or even death, we probably don't feel that much since we think they are more fragile. It's interesting that alcohol will affect people's life expectancy since usually we use alcohol to eliminate melancholy, but it seems different from the models we get.
 
 ```{r}
 # # Exporting Dataset
