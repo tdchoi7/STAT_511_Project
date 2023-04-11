@@ -276,15 +276,21 @@ summary(FullModel)
 ```{r}
 #| echo: false
 
-# Stepwise Forward Regression
-# model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
-ols_step_forward_p(FullModel)
+```{r}
+# Stepwise Backwards/Forward/Both Regression
+Base <- lm(life_exp_2013_response ~ 1, data = life_exp_pt4)
+FullModel <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
+```
+```{r}
+step(Base, scope = list(upper = FullModel, lower = Base), 
+     direction = "forward", trace = FALSE)
 
-# Stepwise Backward Regression
-# model <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
-ols_step_backward_p(FullModel)
+step(FullModel, direction = "backward", trace = FALSE)
 
-# # Best Subset Regression
+step(Base, scope = list(upper = FullModel, lower = Base), direction = "both", trace = TRUE)
+```
+
+### Best Subset Regression
 # Cp_best <- leaps(x = life_exp_pt4[,2:21], y = life_exp_pt4$life_exp_2013_response,
 #              method = "Cp", nbest = 1)
 # 
@@ -303,7 +309,7 @@ ols_step_backward_p(FullModel)
   
 # regfit.full <- regsubsets(life_exp_2013_response ~ ., data = life_exp_pt4)
 # plot(regfit.full, scale = "Cp")
-```
+
 
 ##### b. Report a few models that are candidates for "best" model and discuss their similarities and differences (e.g. what variables get included every time, which variables end up in some models but not others)
 
@@ -336,8 +342,8 @@ ols_step_backward_p(FullModel)
 # anova(adult_mort_red,FullModel)
 # anova(inf_death_trnsfrm_red,FullModel)
 ```
-
 > Since the F statistics is greater than the p value, we will not be adding adult mortality and alcohol, infant deaths and continent, or measles and continent to the model.
+```
 
 ### 6. Based on your results in Step 5 & 6 and substantive knowledge about the dataset, select a preliminary "best" model. Show the summary output for this model and write out the regression equation.
 
