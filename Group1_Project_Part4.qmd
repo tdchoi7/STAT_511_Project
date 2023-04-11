@@ -89,6 +89,7 @@ head(life_exp_pt4)
 ```
 
 ```{r}
+# scaling certain columns to keep them within magnitude
 list_to_scale <- c(4, 12, 14, 17, 18)
 life_exp_pt4[list_to_scale] <- lapply(life_exp_pt4[list_to_scale], function(x) c(scale(x)))
 # # impute nulls
@@ -288,8 +289,9 @@ step(FullModel, direction = "backward", trace = FALSE)
 step(Base, scope = list(upper = FullModel, lower = Base), direction = "both", trace = TRUE)
 ```
 
-### Best Subset Regression
+### Cp model
 ```{r}
+# # commented out due to error in leaps
 # Cp_best <- leaps(x = life_exp_pt4[,2:21], y = life_exp_pt4$life_exp_2013_response,
 #              method = "Cp", nbest = 1)
 # 
@@ -320,7 +322,6 @@ step(Base, scope = list(upper = FullModel, lower = Base), direction = "both", tr
 
 ### 5. Among the variables deemed important, determine whether you will add any pairwise interactions to the model. This should be based off of substantive knowledge of the data & research question. For each interaction of interest, fit a full model (with the interactions) and the reduced model (without interactions) and conduct an F test to determine whether it should be included.
 
-> Doesn't look like we will be doing pairwise interactions, since there doesnt seem to be variables correlated to each other.
 
 ```{r}
 # Full/Reduced Models
@@ -353,13 +354,14 @@ aids_death_trnsfrm_int <- lm(life_exp_2013_response ~ aids_trnsfrm * continent, 
 anova(aids_death_trnsfrm_red, aids_death_trnsfrm_int)
 
 ```
-> We may consider adding adult mortality and alcohol as it had a p-value of less than 0.05.
+> We may consider adding adult mortality and alcohol as it had a p-value of less than 0.05, but other than that it is not likely that we will be doing pairwise interactions.
 
 ### 6. Based on your results in Step 5 & 6 and substantive knowledge about the dataset, select a preliminary "best" model. Show the summary output for this model and write out the regression equation.
 
 ```{r}
 
 # choosing between a model and a model with possible interaction
+# this is from step("both")
 m1 <- lm(formula = life_exp_2013_response ~ inc_comp + aids_trnsfrm +
     tot_exp_trnsfrm + adult_mort + perc_exp_trnsfrm + gdp_trnsfrm,
     data = na.omit(life_exp_pt4))
@@ -386,7 +388,7 @@ summary(m2)
 ##### • How much variation in Y does your set of predictor variables explain?
 
 ##### • Interpret some of the parameters of interest
-> According to our regression models, inc_comp + aids_trnsfrm + tot_exp_trnsfrm + adult_mort + perc_exp_trnsfrm + gdp_trnsfrm are the variables that are most asscociated with out outcome of interest. It makes sense that adult mortality will affect life expectancy. It seems that more education and wealth can afford healthier lifestyles and mortal diseases such as aids will definitely have a negative impact on longevity.
+> According to our regression models, inc_comp + aids_trnsfrm + tot_exp_trnsfrm + adult_mort + perc_exp_trnsfrm + gdp_trnsfrm are the variables that are most asscociated with out outcome of interest. It makes sense that adult mortality will affect life expectancy. It seems that more education and wealth can afford healthier lifestyles and mortal diseases such as aids will definitely have a negative impact on longevity. The predictor variables explain 87.05% of the variation in Y according to the adjusted $R^2$
 
 ```{r}
 # # Exporting Dataset
