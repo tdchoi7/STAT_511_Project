@@ -319,12 +319,11 @@ anova(inf_death_trnsfrm_red,FullModel)
 
 ### 6. Based on your results in Step 5 & 6 and substantive knowledge about the dataset, select a preliminary "best" model. Show the summary output for this model and write out the regression equation.
 ```{r}
-
 m1 <- lm(life_exp_2013_response ~ adult_mort + alcohol_trnsfrm, data = life_exp_pt4)
-
 summary(m1)
-
+anova(m1)
 ```
+>  Y = 75.217382 - 0.048497 * X1 + 8.101951 * X2
 ## Part C -- Preliminary summary
 
 ### Provide a brief (1 paragraph) summary of your findings so far. Some things to comment on:
@@ -334,7 +333,7 @@ summary(m1)
 ##### • How much variation in Y does your set of predictor variables explain?
 
 ##### • Interpret some of the parameters of interest
-> According to our regression models, adult mortality and alcohol trnsfrm variables are the variables that are most asscociated with out outcome of interest. It makes sense that adult mortality will affect life expectancy since we probably don't have the real feeling about death by seeing illness but the rate of death of the people who is similar with us. It is easier for infants and kids to get sick or even death, we probably don't feel that much since we think they are more fragile. It's interesting that alcohol will affect people's life expectancy since usually we use alcohol to eliminate melancholy, but it seems different from the models we get.
+> According to our regression models, adult mortality and alcohol trnsfrm variables are the variables that are most asscociated with out outcome of interest. Our set of predictor variales explain 0.6182 variation in Y. Accoring to the models we build, most of what explained in school can not be explained in inc_comp as well since SSR of school and school|inc_comp are similar to each other and vice versa. It seems there's a big difference of SSR of GDP and GDP|perc_exp, so one of them should be able to be dropped from the model. The variables we chose at last are adult mortality and alcohol trnsfrm, the SSR does have big difference but each of them is still a large number, so none of them should be dropped.
 
 ```{r}
 # # Exporting Dataset
