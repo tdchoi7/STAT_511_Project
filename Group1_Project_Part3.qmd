@@ -261,7 +261,7 @@ boxcox(alcohol_lm)
 
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
-  mutate(perc_exp_trnsfrm = (log(perc_exp))^(1/2))
+  mutate(perc_exp_trnsfrm = perc_exp^(1/4))
 
 # fit the model and the augment
 perc_exp_lm <- lm(longevity ~ perc_exp_trnsfrm, life_exp_2013)
@@ -366,7 +366,7 @@ boxcox(tot_exp_lm)
 
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
-  mutate(aids_trnsfrm = sqrt(log(aids)), na.rm = TRUE)
+  mutate(aids_trnsfrm = aids^(1/4), na.rm = TRUE)
 
 # fit the model and the augment
 aids_lm <- lm(longevity ~ aids_trnsfrm, life_exp_2013)
@@ -401,7 +401,7 @@ boxcox(aids_lm)
 
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
-  mutate(gdp_trnsfrm = sqrt(log(gdp)))
+  mutate(gdp_trnsfrm = gdp^(1/4))
 
 # fit the model and the augment
 gdp_lm <- lm(longevity ~ gdp_trnsfrm, life_exp_2013)

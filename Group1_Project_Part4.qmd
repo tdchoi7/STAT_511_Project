@@ -68,54 +68,54 @@ table(life_exp_pt4$alcohol_trnsfrm)[1]
 ##### b. You should combine levels of categorical variables at this step if necessary.
 
 ```{r}
-# show unique values of columns
-unique(life_exp_pt4$status)
-unique(life_exp_pt4$continent)
-
-# convert dummy variables within dataset
-# https://statisticsglobe.com/convert-factor-to-dummy-variables-in-r
-life_exp_pt4 <- data.frame(life_exp_pt4[ , ! colnames(life_exp_pt4) %in% "continent"],
-                           model.matrix( ~ continent - 1, life_exp_pt4))
-
-life_exp_pt4 <- data.frame(life_exp_pt4[ , ! colnames(life_exp_pt4) %in% "status"],
-                           model.matrix( ~ status - 1, life_exp_pt4))
-
-# remove first columns of the dummified factor variables
-life_exp_pt4 <- life_exp_pt4[-25]
-life_exp_pt4 <- life_exp_pt4[-20]
+# # show unique values of columns
+# unique(life_exp_pt4$status)
+# unique(life_exp_pt4$continent)
+# 
+# # convert dummy variables within dataset
+# # https://statisticsglobe.com/convert-factor-to-dummy-variables-in-r
+# life_exp_pt4 <- data.frame(life_exp_pt4[ , ! colnames(life_exp_pt4) %in% "continent"],
+#                            model.matrix( ~ continent - 1, life_exp_pt4))
+# 
+# life_exp_pt4 <- data.frame(life_exp_pt4[ , ! colnames(life_exp_pt4) %in% "status"],
+#                            model.matrix( ~ status - 1, life_exp_pt4))
+# 
+# # remove first columns of the dummified factor variables
+# life_exp_pt4 <- life_exp_pt4[-25]
+# life_exp_pt4 <- life_exp_pt4[-20]
 
 # check results
 head(life_exp_pt4)
 ```
 
 ```{r}
-
+list_to_scale <- c(4, 12, 14, 17, 18)
+life_exp_pt4[list_to_scale] <- lapply(life_exp_pt4[list_to_scale], function(x) c(scale(x)))
 # # impute nulls
 # # https://stackoverflow.com/questions/20364450/find-names-of-columns-which-contain-missing-values
 # cols_w_null <- names(which(colSums(is.na(life_exp_pt4)) > 0))
 # null_range <- 1:length(cols_w_null)
-# my_range <- 1:length(life_exp_pt4)
+# my_range <- 1:19
 # 
-# # setting NA = -1
+# for (i in null_range)
+#   {
+#   life_exp_pt4[cols_w_null[i]][is.na(life_exp_pt4[cols_w_null[i]])] <- median(life_exp_pt4[cols_w_null[i]], na.rm = TRUE)
+#   }
+# 
+# # scaling data
 # for (i in my_range)
 #   {
 #   life_exp_pt4[i] <-
 #     rescale_max(life_exp_pt4[i])
 # }
 # 
-# for (i in null_range)
-#   {
-#   life_exp_pt4[cols_w_null[i]][is.na(life_exp_pt4[cols_w_null[i]])] <- -1
-#   # if setting to median instead:
-#   #   life_exp_pt4[cols_w_null[i]][is.na(life_exp_pt4[cols_w_null[i]])] <-
-# #     median(life_exp_pt4[cols_w_null[i]], na.rm = TRUE)
-#   }
 # 
 # # check if columns contain any null values - sum should be 0 if no nulls
 # # https://www.geeksforgeeks.org/how-to-check-missing-values-in-r-dataframe/
-# sum(is.na(life_exp_pt4)) 
+# sum(is.na(life_exp_pt4))
 
 ```
+> Did not scale as we had null values that were not imputed
 
 > From part 3: Thinness of Ages 1 to 19 and Thinness of Ages 5 to 9 seem to be quite correlated/possibly colinear (Corr: 0.925). Income Composition of Resources and Schooling also seem to be correlated/possibly colinear (Corr: 0.913). Percent Expenditure on Health as a Percentage of GDP and GDP also seem highly correlated/possibly colinear (Corr: 0.918). Infant Deaths and Under 5 Deaths seem to be quite correlated/possibly colinear (Corr: 0.997). Hepatitis B and Diptheria also seem to be correlated/possibly colinear (Corr: 0.711)
 
@@ -123,24 +123,24 @@ head(life_exp_pt4)
 
 # check for interactions
 # compare thinness 1-19 to thinness 5-9
-lm_thin_1 <- lm(life_exp_2013_response ~ thin_1_19_trnsfrm + thin_5_9_trnsfrm, data = life_exp_pt4)
+lm_thin_1 <- lm(life_exp_2013_response ~ thin_1_19_trnsfrm + thin_5_9_trnsfrm, data = na.omit(life_exp_pt4))
 
 summary(lm_thin_1)
 anova(lm_thin_1)
 
-lm_thin_2 <- lm(life_exp_2013_response ~ thin_5_9_trnsfrm + thin_1_19_trnsfrm, data = life_exp_pt4)
+lm_thin_2 <- lm(life_exp_2013_response ~ thin_5_9_trnsfrm + thin_1_19_trnsfrm, data = na.omit(life_exp_pt4))
 
 summary(lm_thin_2)
 anova(lm_thin_2)
 
 # to check if we should drop one of the thinness columns
-lm_thin_59 <- lm(life_exp_2013_response ~ thin_5_9_trnsfrm, data = life_exp_pt4)
+lm_thin_59 <- lm(life_exp_2013_response ~ thin_5_9_trnsfrm, data = na.omit(life_exp_pt4))
 
 
 # checking reduced to full model
 anova(lm_thin_59, lm_thin_2)
 
-lm_thin_119 <- lm(life_exp_2013_response ~ thin_1_19_trnsfrm, data = life_exp_pt4)
+lm_thin_119 <- lm(life_exp_2013_response ~ thin_1_19_trnsfrm, data = na.omit(life_exp_pt4))
 
 # checking reduced to full model
 anova(lm_thin_119, lm_thin_1)
@@ -150,22 +150,22 @@ anova(lm_thin_119, lm_thin_1)
 ```{r}
 
 # compare schooling and income composition
-lm_incsch_1 <- lm(life_exp_2013_response ~ inc_comp + school, data = life_exp_pt4)
+lm_incsch_1 <- lm(life_exp_2013_response ~ inc_comp + school, data = na.omit(life_exp_pt4))
 
 summary(lm_incsch_1)
 anova(lm_incsch_1)
 
-lm_incsch_2 <- lm(life_exp_2013_response ~ school + inc_comp, data = life_exp_pt4)
+lm_incsch_2 <- lm(life_exp_2013_response ~ school + inc_comp, data = na.omit(life_exp_pt4))
 
 summary(lm_incsch_2)
 anova(lm_incsch_2)
 
 # to check if we should drop school or inc_comp
-lm_inc <- lm(life_exp_2013_response ~ inc_comp, data = life_exp_pt4)
+lm_inc <- lm(life_exp_2013_response ~ inc_comp, data = na.omit(life_exp_pt4))
 
 anova(lm_inc, lm_incsch_1)
 
-lm_school <- lm(life_exp_2013_response ~ school, data = life_exp_pt4)
+lm_school <- lm(life_exp_2013_response ~ school, data = na.omit(life_exp_pt4))
 
 anova(lm_school, lm_incsch_2)
 
@@ -173,47 +173,47 @@ anova(lm_school, lm_incsch_2)
 
 ```{r}
 
-# # compare perc_exp and gdp
-# lm_percgdp_1 <- lm(life_exp_2013_response ~ perc_exp_trnsfrm + gdp_trnsfrm, data = life_exp_pt4)
-# 
-# summary(lm_percgdp_1)
-# anova(lm_percgdp_1)
-# 
-# lm_percgdp_2 <- lm(life_exp_2013_response ~ gdp_trnsfrm +  perc_exp_trnsfrm, data = life_exp_pt4)
-# 
-# summary(lm_percgdp_2)
-# anova(lm_percgdp_2)
-# 
-# # check which column to drop
-# lm_percexp <- lm(life_exp_2013_response ~ perc_exp_trnsfrm, data = life_exp_pt4)
-# 
-# anova(lm_percexp, lm_percgdp_1)
-# 
-# lm_gdp <- lm(life_exp_2013_response ~ gdp_trnsfrm, data = life_exp_pt4)
-# 
-# anova(lm_gdp, lm_percgdp_2)
+# compare perc_exp and gdp
+lm_percgdp_1 <- lm(life_exp_2013_response ~ perc_exp_trnsfrm + gdp_trnsfrm, data = na.omit(life_exp_pt4))
+
+summary(lm_percgdp_1)
+anova(lm_percgdp_1)
+
+lm_percgdp_2 <- lm(life_exp_2013_response ~ gdp_trnsfrm +  perc_exp_trnsfrm, data = na.omit(life_exp_pt4))
+
+summary(lm_percgdp_2)
+anova(lm_percgdp_2)
+
+# check which column to drop
+lm_percexp <- lm(life_exp_2013_response ~ perc_exp_trnsfrm, data = na.omit(life_exp_pt4))
+
+anova(lm_percexp, lm_percgdp_1)
+
+lm_gdp <- lm(life_exp_2013_response ~ gdp_trnsfrm, data = na.omit(life_exp_pt4))
+
+anova(lm_gdp, lm_percgdp_2)
 
 ```
 
 ```{r}
 
 # compare infant deaths and under 5 deaths
-lm_ifu5_1 <- lm(life_exp_2013_response ~ inf_death_trnsfrm + u5_deaths_trnsfrm, data = life_exp_pt4)
+lm_ifu5_1 <- lm(life_exp_2013_response ~ inf_death_trnsfrm + u5_deaths_trnsfrm, data = na.omit(life_exp_pt4))
 
 summary(lm_ifu5_1)
 anova(lm_ifu5_1)
 
-lm_ifu5_2 <- lm(life_exp_2013_response ~ u5_deaths_trnsfrm + inf_death_trnsfrm, data = life_exp_pt4)
+lm_ifu5_2 <- lm(life_exp_2013_response ~ u5_deaths_trnsfrm + inf_death_trnsfrm, data = na.omit(life_exp_pt4))
 
 summary(lm_ifu5_2)
 anova(lm_ifu5_2)
 
 # check which column to drop
-lm_inf <- lm(life_exp_2013_response ~ inf_death_trnsfrm, data = life_exp_pt4)
+lm_inf <- lm(life_exp_2013_response ~ inf_death_trnsfrm, data = na.omit(life_exp_pt4))
 
 anova(lm_inf, lm_ifu5_1)
 
-lm_u5 <- lm(life_exp_2013_response ~ u5_deaths_trnsfrm, data = life_exp_pt4)
+lm_u5 <- lm(life_exp_2013_response ~ u5_deaths_trnsfrm, data = na.omit(life_exp_pt4))
 
 anova(lm_u5, lm_ifu5_2)
 
@@ -221,29 +221,29 @@ anova(lm_u5, lm_ifu5_2)
 
 ```{r}
 
-# # compare hep b and diptheria
-# lm_hepbdipth_1 <- lm(life_exp_2013_response ~ hep_b_trnsfrm + dipth_trnsfrm, data = life_exp_pt4)
-# 
-# summary(lm_hepbdipth_1)
-# anova(lm_hepbdipth_1)
-# 
-# lm_hepbdipth_2 <- lm(life_exp_2013_response ~ dipth_trnsfrm + hep_b_trnsfrm, data = life_exp_pt4)
-# 
-# summary(lm_hepbdipth_2)
-# anova(lm_hepbdipth_2)
-# 
-# # check which column to drop
-# lm_hepb <- lm(life_exp_2013_response ~ hep_b_trnsfrm, data = life_exp_pt4)
-# 
-# anova(lm_hepb, lm_hepbdipth_1)
-# 
-# lm_dipth <- lm(life_exp_2013_response ~ dipth_trnsfrm, data = life_exp_pt4)
-# 
-# anova(lm_dipth, lm_hepbdipth_2)
+# compare hep b and diptheria
+lm_hepbdipth_1 <- lm(life_exp_2013_response ~ hep_b_trnsfrm + dipth_trnsfrm, data = na.omit(life_exp_pt4))
+
+summary(lm_hepbdipth_1)
+anova(lm_hepbdipth_1)
+
+lm_hepbdipth_2 <- lm(life_exp_2013_response ~ dipth_trnsfrm + hep_b_trnsfrm, data = na.omit(life_exp_pt4))
+
+summary(lm_hepbdipth_2)
+anova(lm_hepbdipth_2)
+
+# check which column to drop
+lm_hepb <- lm(life_exp_2013_response ~ hep_b_trnsfrm, data = na.omit(life_exp_pt4))
+
+anova(lm_hepb, lm_hepbdipth_1)
+
+lm_dipth <- lm(life_exp_2013_response ~ dipth_trnsfrm, data = na.omit(life_exp_pt4))
+
+anova(lm_dipth, lm_hepbdipth_2)
 
 ```
 
-> thin_1_19_trnsfrm and can be dropped from the model as it is the only one that had a high p-value
+> thin_1_19_trnsfrm and perc_exp can be dropped from the model as they have high p-values. We will drop thinness only for now as there should be a direct overlap between thin_1_19_trnsfrm and thin_5_9_trnsfrm
 
 ### 2. Fit a main effects (no interactions) model with the full set of P-1 predictors
 
@@ -251,10 +251,11 @@ anova(lm_u5, lm_ifu5_2)
 
 # drop thin_1_19_trnsfrm column
 life_exp_pt4 <- life_exp_pt4[-8]
+# life_exp_pt4 <- life_exp_pt4[-3]
 
 # fitting the full model
-FullModel <- lm(life_exp_2013_response ~ .,
-                   data = life_exp_pt4)
+# FullModel <- lm(life_exp_2013_response ~ ., data = life_exp_pt4[,-6])
+FullModel <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
 
 ```
 
@@ -275,13 +276,10 @@ summary(FullModel)
 
 ```{r}
 #| echo: false
-
-```{r}
 # Stepwise Backwards/Forward/Both Regression
-Base <- lm(life_exp_2013_response ~ 1, data = life_exp_pt4)
-FullModel <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
-```
-```{r}
+Base <- lm(life_exp_2013_response ~ 1, data = na.omit(life_exp_pt4))
+FullModel <- lm(life_exp_2013_response ~ ., data = na.omit(life_exp_pt4))
+
 step(Base, scope = list(upper = FullModel, lower = Base), 
      direction = "forward", trace = FALSE)
 
@@ -291,6 +289,7 @@ step(Base, scope = list(upper = FullModel, lower = Base), direction = "both", tr
 ```
 
 ### Best Subset Regression
+```{r}
 # Cp_best <- leaps(x = life_exp_pt4[,2:21], y = life_exp_pt4$life_exp_2013_response,
 #              method = "Cp", nbest = 1)
 # 
@@ -309,7 +308,7 @@ step(Base, scope = list(upper = FullModel, lower = Base), direction = "both", tr
   
 # regfit.full <- regsubsets(life_exp_2013_response ~ ., data = life_exp_pt4)
 # plot(regfit.full, scale = "Cp")
-
+```
 
 ##### b. Report a few models that are candidates for "best" model and discuss their similarities and differences (e.g. what variables get included every time, which variables end up in some models but not others)
 
@@ -325,35 +324,58 @@ step(Base, scope = list(upper = FullModel, lower = Base), direction = "both", tr
 
 ```{r}
 # Full/Reduced Models
-# adult_mort_red <- lm(life_exp_2013_response ~ adult_mort * alcohol_trnsfrm, data = life_exp_pt4)
-# 
-# inf_death_trnsfrm_red <- lm(life_exp_2013_response ~ inf_death_trnsfrm * continent, data = life_exp_pt4)
-# 
-# measles_death_trnsfrm_red <- lm(life_exp_2013_response ~ measles_trnsfrm * continent, data = life_exp_pt4)
-# 
-# FullModel <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
-# 
-# adult_mort_red 
-# inf_death_trnsfrm_red
-# measles_death_trnsfrm_red
-# FullModel
-# 
-# anova(measles_death_trnsfrm_red,FullModel)
-# anova(adult_mort_red,FullModel)
-# anova(inf_death_trnsfrm_red,FullModel)
+# check interactions btwn adult mortality and alcohol
+adult_mort_red <- lm(life_exp_2013_response ~ adult_mort + alcohol_trnsfrm, data = na.omit(life_exp_pt4))
+
+adult_mort_int <- lm(life_exp_2013_response ~ adult_mort * alcohol_trnsfrm, data = na.omit(life_exp_pt4))
+
+anova(adult_mort_red, adult_mort_int)
+
 ```
-> Since the F statistics is greater than the p value, we will not be adding adult mortality and alcohol, infant deaths and continent, or measles and continent to the model.
+
+```{r}
+# Full/Reduced Models
+# check interactions btwn inf death and continent
+inf_death_trnsfrm_red <- lm(life_exp_2013_response ~ inf_death_trnsfrm + continent, data = na.omit(life_exp_pt4))
+
+inf_death_trnsfrm_int <- lm(life_exp_2013_response ~ inf_death_trnsfrm * continent, data = na.omit(life_exp_pt4))
+
+anova(inf_death_trnsfrm_red, inf_death_trnsfrm_int)
 ```
+
+```{r}
+# Full/Reduced Models
+# check interactions btwn aids and continent
+aids_death_trnsfrm_red <- lm(life_exp_2013_response ~ aids_trnsfrm + continent, data = na.omit(life_exp_pt4))
+
+aids_death_trnsfrm_int <- lm(life_exp_2013_response ~ aids_trnsfrm * continent, data = na.omit(life_exp_pt4))
+
+anova(aids_death_trnsfrm_red, aids_death_trnsfrm_int)
+
+```
+> We may consider adding adult mortality and alcohol as it had a p-value of less than 0.05.
 
 ### 6. Based on your results in Step 5 & 6 and substantive knowledge about the dataset, select a preliminary "best" model. Show the summary output for this model and write out the regression equation.
 
 ```{r}
 
-m1 <- lm(life_exp_2013_response ~ adult_mort + alcohol_trnsfrm, data = life_exp_pt4)
+# choosing between a model and a model with possible interaction
+m1 <- lm(formula = life_exp_2013_response ~ inc_comp + aids_trnsfrm +
+    tot_exp_trnsfrm + adult_mort + perc_exp_trnsfrm + gdp_trnsfrm,
+    data = na.omit(life_exp_pt4))
 
 summary(m1)
 
+m2 <- lm(formula = life_exp_2013_response ~ inc_comp + aids_trnsfrm +
+    tot_exp_trnsfrm + perc_exp_trnsfrm + gdp_trnsfrm + adult_mort * alcohol_trnsfrm,
+    data = na.omit(life_exp_pt4))
+
+summary(m2)
+
 ```
+> We will use m1 as our model since the interaction did not help the model
+
+> $\hat{y_i}$ = 50.3840 + 32.9851 x inc_comp + -6.4658 x aids_trnsfrm + 1.2166 x tot_exp_trnsfrm + -1.2248 x adult_mort + 1.4622 x perc_exp_trnsfrm + -0.7980 x gdp_trnsfrm
 
 ## Part C -- Preliminary summary
 
@@ -364,8 +386,7 @@ summary(m1)
 ##### • How much variation in Y does your set of predictor variables explain?
 
 ##### • Interpret some of the parameters of interest
-
-> According to our regression models, adult mortality and alcohol trnsfrm variables are the variables that are most asscociated with out outcome of interest. It makes sense that adult mortality will affect life expectancy since we probably don't have the real feeling about death by seeing illness but the rate of death of the people who is similar with us. It is easier for infants and kids to get sick or even death, we probably don't feel that much since we think they are more fragile. It's interesting that alcohol will affect people's life expectancy since usually we use alcohol to eliminate melancholy, but it seems different from the models we get.
+> According to our regression models, inc_comp + aids_trnsfrm + tot_exp_trnsfrm + adult_mort + perc_exp_trnsfrm + gdp_trnsfrm are the variables that are most asscociated with out outcome of interest. It makes sense that adult mortality will affect life expectancy. It seems that more education and wealth can afford healthier lifestyles and mortal diseases such as aids will definitely have a negative impact on longevity.
 
 ```{r}
 # # Exporting Dataset
