@@ -293,24 +293,29 @@ ggplot(Cp_best, aes(x = num_in_model, y = Cp)) +
 > After looking at the models, it doesnt look like any indicator variables need to be added in or adjusted, since no catergorical variable levels are missing. Releveling would not do much as the only ordered categorical variable was the status column, but that column only had 2 options (developed, developing)
 
 ### 5. Among the variables deemed important, determine whether you will add any pairwise interactions to the model. This should be based off of substantive knowledge of the data & research question. For each interaction of interest, fit a full model (with the interactions) and the reduced model (without interactions) and conduct an F test to determine whether it should be included.
-> Doesn't look like we will be doing pairwise interactions, since there doesnt seem to be variables correlated to each other.
+
+> Doesn't look like we will be doing pairwise interactions, since there doesnt seem to be variables correlated to each other. 
 
 ```{r}
 # Full/Reduced Models
-adult_mort_red <- lm(life_exp_2013_response ~ adult_mort, data = life_exp_pt4)
+adult_mort_red <- lm(life_exp_2013_response ~ adult_mort*alcohol_trnsfrm, data = life_exp_pt4)
 
-inf_death_trnsfrm_red <- lm(life_exp_2013_response ~ inf_death_trnsfrm, data = life_exp_pt4)
+inf_death_trnsfrm_red <- lm(life_exp_2013_response ~ inf_death_trnsfrm*continent, data = life_exp_pt4)
 
-# FullModel <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
+measles_death_trnsfrm_red <- lm(life_exp_2013_response ~ measles_trnsfrm*continent, data = life_exp_pt4)
 
-# adult_mort_red
-# inf_death_trnsfrm_red
-# FullModel
+FullModel <- lm(life_exp_2013_response ~ ., data = life_exp_pt4)
 
-anova(adult_mort_red, FullModel)
+adult_mort_red 
+inf_death_trnsfrm_red
+measles_death_trnsfrm_red
+FullModel
+
+anova(measles_death_trnsfrm_red,FullModel)
+anova(adult_mort_red,FullModel)
 anova(inf_death_trnsfrm_red,FullModel)
 ```
-> Since the F statistic is greater than the p value, we will not be adding adult mortality or infant deaths to the model.
+> Since the F statistics is greater than the p value, we will not be adding adult mortality and alcohol, infant deaths and continent, or measles and continent to the model.
 
 ### 6. Based on your results in Step 5 & 6 and substantive knowledge about the dataset, select a preliminary "best" model. Show the summary output for this model and write out the regression equation.
 ```{r}
