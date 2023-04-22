@@ -1,5 +1,5 @@
 ---
-title: "Project Part 3"
+title: "Project Data Cleaning File"
 subtitle: "STAT 511"
 author: "Moses Sanches, Shuyu Wang, Theodore Choi"
 date: "`r Sys.Date()`"
@@ -30,33 +30,131 @@ library(tidyverse)
 library(dplyr)
 library(broom)
 library(ggplot2)
-library(corrplot)
 library(GGally)
 library(glue)
 library(ggpubr)
 library(olsrr)
 library(MASS)
 library(cowplot)
+library(pastecs)
+library(countrycode)
+library(corrplot)
 
 ```
 
 ```{r}
 
-# import data
-filepath_2013 <- "./data/Longevity Data Year 2013 Cleaned.rds"
+# Information regarding data from:
+# https://www.kaggle.com/datasets/kumarajarshi/life-expectancy-who?resource=download
 
-life_exp_2013 <- readRDS(filepath_2013)
+# load data (must have file in correct project folder)
+life_exp <- read.csv("./data/Life Expectancy Data.csv")
+# life_exp
 
-# show the top rows of the dataframe
-head(life_exp_2013)
+# add continent to dataset
+# https://stackoverflow.com/questions/47510141/get-continent-name-from-country-name-in-r
+life_exp$continent <- countrycode(sourcevar = life_exp[,"Country"],
+                                  origin = "country.name",
+                                  destination = "continent")
+
+# Change Variable names for ease of use - including changing to lowercase
+life_exp <- life_exp %>% 
+  rename(
+    country = Country,
+    year = Year,
+    status = Status,
+    longevity = Life.expectancy,
+    adult_mort = Adult.Mortality, # number of deaths aged 15 - 60 per 1000 people
+    inf_death = infant.deaths, # number  of infant deaths per 1000 people
+    alcohol = Alcohol, # Liters of pure alcohol consumed per capita (15 YO +)
+    perc_exp = percentage.expenditure, # % Expenditure on health as percentage of GDP per Capita
+    hep_b = Hepatitis.B, # % of 1 YO immunized against Hep B
+    measles = Measles, # Number of reported cases per 1000 people
+    bmi = BMI, # Average BMI for population
+    u5_deaths = under.five.deaths, # number of under 5 deaths per 1000
+    polio = Polio, # % of 1 YO immunized against polio
+    tot_exp = Total.expenditure, # % general gov expenditure on health vs total gov expenditure
+    dipth = Diphtheria, # % 1 YO vaccinated TDaP
+    aids = HIV.AIDS, # deaths per 1000 live births HIV/AIDS (0-4 years)
+    gdp = GDP, # GDP per captia in USD
+    pop = Population,
+    thin_1_19 = thinness..1.19.years, # % prevalence of thinness among 10 - 19 YO 
+    thin_5_9 = thinness.5.9.years, # % prevalence of thinness among 5 - 9 YO 
+    inc_comp = Income.composition.of.resources, # Human Development Index - income composition of resources
+    school = Schooling # number of years of schooling
+  )
+
+# change character columns to factors
+life_exp <- as.data.frame(unclass(life_exp), stringsAsFactors = TRUE)
+
+# check classes to see if the changes held
+sapply(life_exp, class)
+
+# set the response variable to the Life.expectancy column as y
+# this may not be necessary, but was done preemptively for the linear model
+y <- life_exp$longevity
+
+# remove the response variable from the dataframe and assign to x
+# this may not be necessary, but was done preemptively for the linear model
+x <- life_exp[,-4]
 
 ```
 
-## Part A -- continuous predictors
+#### 2. Filter the data to remove any rows that have a missing value for your main response variable. Make note of how many observations this removes. 
+```{r}
 
-### 1. Produce a scatterplot matrix and the correlation matrix for all continuous predictors and the response variable.
+# check summary to determine if there are nulls
+summary(y)
 
-> We will break up the numerical predictors by continuous and discrete as it seems to be the simplest way of divvying up the numerical variables
+```
+
+> There are 10 null values in the label
+
+```{r}
+
+# remove the null values and assign the new dataframe with removed nulls to new variable
+life_exp1 <- life_exp[complete.cases(life_exp$longevity),]
+
+# check for nulls in the summary
+summary(life_exp1$longevity)
+
+```
+
+> Removing the null values from the response variable resulted in the removal of 10 rows
+
+```{r}
+head(
+    life_exp %>%
+      group_by(year) %>%
+        count(year) %>%
+          arrange(desc(n)))
+
+# save dataframe of data from 2013
+# The year 2013 was chosen, since that is the year with the highest count of rows
+life_exp_2013 <- life_exp1[life_exp1$year==2013, -2]
+
+# reset dataframe index
+rownames(life_exp_2013) <- 1:nrow(life_exp_2013) 
+
+dim(life_exp_2013)
+
+colnames(life_exp_2013)
+
+# plot correlation between columns
+cor.life_exp_2013 <- cor(life_exp_2013[sapply(life_exp_2013, is.numeric)], use = "complete.obs")
+corrplot(cor.life_exp_2013)
+
+# assign filepaths to variables
+filepath_1 <- "./data/longevity Data Cleaned Version.csv"
+
+filepath_2013 <- "./data/Longevity Data Year 2013 Cleaned.rds"
+
+# save to csv
+saveRDS(life_exp_2013, filepath_2013)
+
+```
+
+
 
 ### Continuous Variable Analysis
 
@@ -1081,3 +1179,35 @@ filepath_2013_tfm <- "./data/Longevity Data Year 2013 Cleaned Transformed.rds"
 # save to csv
 saveRDS(life_exp_2013_tfm, filepath_2013_tfm)
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
