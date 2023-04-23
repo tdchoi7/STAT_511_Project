@@ -1,0 +1,246 @@
+---
+title: "Project Appendix
+"
+subtitle: "STAT 511"
+author: "Moses Sanches, Shuyu Wang, Theodore Choi"
+date: "`r Sys.Date()`"
+format: 
+  html:
+    self-contained: true
+    toc: true
+    toc_float: true
+    number-section: false
+    highlight: tango
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+```{r}
+#| message: false
+#| warning: false
+# Libraries we used
+library(openintro)
+library(tidyverse)
+library(dplyr)
+library(scales)
+library(leaps)
+library(MASS)
+library(olsrr)
+library(car)
+```
+
+### Preliminary analysis using basic visualizations
+```{r}
+# getting summaries of the status counts
+# string values did not return summary statistics
+summary_num <- stat.desc(select_if(life_exp, is.numeric))
+round(summary_num, 2)
+
+# frequency of status by country
+table(life_exp$Continent, life_exp$Status) 
+```
+
+#### B. Produce visual summaries (one for each variable based on variable type) – boxplots/histograms or bar charts.
+```{r}
+# Getting counts of the Status (Developing vs developed)
+counts_status <- table(life_exp$Status)
+
+# Plotting a bar chart of the counts
+barplot(counts_status,
+        main = "Status Counts",
+        ylab = "Counts",
+        xlab = "Status")
+
+# Getting frequency of Adult Mortality
+# Defined as:
+# "Adult Mortality Rates of both sexes
+# (probability of dying between 15 and 60 years per 1000 population)"
+hist(life_exp$Adult.Mortality,
+     main = "Histogram of Adult Mortality",
+     xlab = "Adult Mortality")
+
+# Consumption of Alcohol per capita (15+) in liters
+hist(life_exp$Alcohol,
+     main = "Histogram of Alcohol",
+     xlab = "Alcohol Consumption")
+
+# Hepatitis B (HepB) immunization coverage among 1-year-olds (%)
+hist(life_exp$Hepatitis.B,
+     main = "Histogram of Hepatits B",
+     xlab = "Infected with Hepatitis B")
+
+# Year
+hist(life_exp$Year,
+     main = "Histogram of year",
+     xlab = "Years")
+
+# Plotting a bar chart of the  Continent counts
+# (too many countries to plot cleanly)
+counts_continent <- table(life_exp$Continent)
+barplot(counts_continent,
+        main = "Count of Continents",
+        ylab = "Counts",
+        xlab = "Continents")
+
+# infant deaths
+hist(life_exp$infant.deaths,
+     main = "Histogram of Infant Deaths",
+     xlab = "Infant Deaths")
+
+# percentage expenditure 
+hist(life_exp$percentage.expenditure,
+     main = "Histogram of Percentage Expenditure",
+     xlab = "Percent Expenditure")
+
+# Measles
+hist(life_exp$Measles,
+     main = "Histogram of Measles",
+     xlab = "Infected with Measles")
+
+# BMI
+hist(life_exp$BMI,
+     main = "Histogram of BMI",
+     xlab = "BMI")
+
+# under 5 deaths
+hist(life_exp$under.five.deaths,
+     main = "Histogram of Under 5 Deaths",
+     xlab = "Amount of deaths under 5")
+
+# Polio
+hist(life_exp$Polio,
+     main = "Histogram of Polio Occurence",
+     xlab = "Polio Occurrence")
+
+# Total Expenditure
+hist(life_exp$Total.expenditure,
+     main = "Histogram of Total Expenditure",
+     xlab = "Total Expenditure")
+
+# Diphtheria
+hist(life_exp$Diphtheria,
+     main = "Histogram of Frequency of Diphtheria",
+     xlab = "Diphtheria")
+
+# AIDS
+hist(life_exp$HIV.AIDS,
+     main = "Histogram of Frequency of HIV AIDS",
+     xlab = "HIV AIDS")
+
+# GDP
+hist(life_exp$GDP,
+     main = "Histogram of GDP",
+     xlab = "GDP")
+
+# Population
+hist(life_exp$Population,
+     main = "Histogram of Population",
+     xlab = "Population")
+
+# Thinness(1-19 years):
+# Prevalence of thinness among children and adolescents for Age 10 to 19 (%)
+hist(life_exp$thinness..1.19.years,
+     main = "Histogram of Thinness from age 10 to 19",
+     xlab = "Age")
+
+# Thinness(5-9 years):Prevalence of thinness among children for Age 5 to 9(%)
+hist(life_exp$thinness.5.9.years,
+     main = "Histogram of Thinness from age 5 to 9",
+     xlab = "Age")
+
+# Income Composition of Resources:
+# Human Development Index in terms of income composition of resources
+# (index ranging from 0 to 1)
+hist(life_exp$Income.composition.of.resources,
+     main = "Histogram of Resource Composition",
+     xlab = "Index")
+
+# Schooling:Number of years of Schooling(years)
+hist(life_exp$thinness.5.9.years,
+     main = "Histogram of Years of Schooling",
+     xlab = "Years")
+
+# plotting a histogram of the response variable (life expectancy)
+hist(y,
+     main = "Histogram of Life Expectancy",
+     xlab = "Age")
+
+# boxplot of life expectancy across the continents
+life_exp %>%
+  ggplot(aes(x = Continent,
+             y = Life.expectancy,
+             fill = Continent)) +
+  geom_boxplot(outlier.color = "black",
+               outlier.shape = 16,
+               outlier.size = 2,
+               notch = FALSE)
+```
+
+#### C. Are there any potential issues with any of the data?
+> The data still has some missing values and can be a little difficult to interpret - use of the data descriptors found in the link is highly recommended. The Life Expectancy column (response variable) is skewed left, so some transformations may have to be performed to ensure a normal curve. We can also see skewed distributions across the variables (Histogram of Infant Deaths and Histogram of Under 5 Deaths among others), possible missing data (as seen in Histogram of Total Expenditure), as well as possible outliers (as seen in Histogram of Population,the Histograms of thinness). Another interesting issue that we can see is a bimodal distribution (as seen in the Histogram of BMI). There may also be issues with the frequency of the number of years for the early 2000s as there is a lot of data for 2000.
+
+```{r}
+
+# import data
+filepath_2013 <- "./data/longevity Data Cleaned Version 2013 TFM.rds"
+
+life_exp_pt4 <- readRDS(filepath_2013)
+
+```
+
+
+```{r}
+
+n <- dim(life_exp_pt4)[1]
+p <- dim(life_exp_pt4)[2]
+
+
+m1 <- lm(formula = life_exp_2013_response ~ inc_comp + aids_trnsfrm +
+    tot_exp_trnsfrm + adult_mort + perc_exp_trnsfrm + gdp_trnsfrm,
+    data = life_exp_pt4)
+
+# print VIF values to check if any are greater than 10
+vif(m1)
+
+ols_plot_resid_stud(m1)
+
+leverage <- hatvalues(m1)
+
+whichones <- which(leverage>2*p/n)
+
+leverage[whichones]
+
+ols_plot_cooksd_chart(m1)
+
+# sorted since there were observations that were excluded by ols_plot_cooksd_chart and the index values of the chart are not accurate
+pf(sort(cooks.distance(m1), decreasing = T)[c(1, 2, 3)], p, n-p)
+
+# to find the threshold for DFFITS
+2*sqrt(p/n)
+
+sort(dffits(m1), decreasing = T)[c(1, 2, 3)]
+
+# take a look at the ones that are the same across the tests and then remove (pg 14 of chap 10)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
