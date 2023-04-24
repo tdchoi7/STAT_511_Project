@@ -40,6 +40,7 @@ library(countrycode)
 ```
 
 ### Preliminary analysis using basic visualizations
+
 ```{r}
 # load data (must have file in correct project folder)
 life_exp <- read.csv("./data/Life Expectancy Data.csv")
@@ -66,6 +67,7 @@ table(life_exp$Continent, life_exp$Status)
 ```
 
 ### Producing visual summaries
+
 ```{r}
 # Getting counts of the Status (Developing vs developed)
 counts_status <- table(life_exp$Status)
@@ -200,9 +202,11 @@ life_exp %>%
                outlier.size = 2,
                notch = FALSE)
 ```
+
 > The data still has some missing values and can be a little difficult to interpret - use of the data descriptors found in the link is highly recommended. The Life Expectancy column (response variable) is skewed left, so some transformations may have to be performed to ensure a normal curve. We can also see skewed distributions across the variables (Histogram of Infant Deaths and Histogram of Under 5 Deaths among others), possible missing data (as seen in Histogram of Total Expenditure), as well as possible outliers (as seen in Histogram of Population,the Histograms of thinness). Another interesting issue that we can see is a bimodal distribution (as seen in the Histogram of BMI). There may also be issues with the frequency of the number of years for the early 2000s as there is a lot of data for 2000.
 
 ### Getting best models
+
 ```{r}
 
 # import data
@@ -231,9 +235,11 @@ step(FullModel, direction = "backward", trace = FALSE)
 # using both
 step(Base, scope = list(upper = FullModel, lower = Base), direction = "both", trace = TRUE)
 ```
+
 > We will use stepwise forward/backward as it produces a more comprehensive approach to finding the best model
 
 ##### Considering possible interactions
+
 ```{r}
 # considering interactions that would reduce longevity:
 # alcohol consumption and AIDS were considered. Alcohol was considered as it is a drug that impairs cognitive function and AIDS was considered due to the fact that it is an STD that will almost always claim its victim's lives
@@ -257,9 +263,11 @@ aids_death_trnsfrm_int <- lm(longevity ~ aids_trnsfrm * continent, data = na.omi
 anova(aids_death_trnsfrm_red, aids_death_trnsfrm_int)
 
 ```
+
 > It seems that alcohol may have more of an interaction with continents than does AIDS, which makes sense because some regions have outlawed alcohol whereas AIDS cannot be contained by law
 
 ##### Checking the final models to determine if interactions are worth including
+
 ```{r}
 # checking final models 
 m1 <- lm(formula = longevity ~ inc_comp + aids_trnsfrm + tot_exp_trnsfrm + 
@@ -275,9 +283,11 @@ m2 <- lm(formula = longevity ~ inc_comp + aids_trnsfrm + tot_exp_trnsfrm +
 
 summary(m2)
 ```
-> According to our regression models, inc_comp, aids_trnsfrm, tot_exp_trnsfrm, adult_mort, and thin_1_19_trnsfrm are the variables that are most asscociated with out outcome of interest. It makes sense that adult mortality will affect life expectancy. It seems that more education (schooling was correlated with income composition) and wealth can afford healthier lifestyles. Seeing how income composition (according to the Human Development Index in terms of income composition of resources - https://www.kaggle.com/datasets/kumarajarshi/life-expectancy-who?resource=download) is so positively correlated with longevity, real world knowledge of the impact of wealth on health is evident. With greater dissemination of technology and information comes the expectation of longer life. In terms of Total Expenditure (which is the government's spending on health), we can see that the more a government spends, the greater the longevity. Mortal diseases such as aids will definitely have a negative impact on longevity as the disease tends to cut life short. Thinness from ages 1-19 will also impact the life expectancy as we can most likely assume that it measures some form of undernourishment. Adult mortality is definitely going to negatively impact longevity as a higher death rate can point to shorter lifespans. The predictor variables explain 86.22% of the variation in Y according to the adjusted $R^2$
+
+> According to our regression models, inc_comp, aids_trnsfrm, tot_exp_trnsfrm, adult_mort, and thin_1\_19_trnsfrm are the variables that are most asscociated with out outcome of interest. It makes sense that adult mortality will affect life expectancy. It seems that more education (schooling was correlated with income composition) and wealth can afford healthier lifestyles. Seeing how income composition (according to the Human Development Index in terms of income composition of resources - https://www.kaggle.com/datasets/kumarajarshi/life-expectancy-who?resource=download) is so positively correlated with longevity, real world knowledge of the impact of wealth on health is evident. With greater dissemination of technology and information comes the expectation of longer life. In terms of Total Expenditure (which is the government's spending on health), we can see that the more a government spends, the greater the longevity. Mortal diseases such as aids will definitely have a negative impact on longevity as the disease tends to cut life short. Thinness from ages 1-19 will also impact the life expectancy as we can most likely assume that it measures some form of undernourishment. Adult mortality is definitely going to negatively impact longevity as a higher death rate can point to shorter lifespans. The predictor variables explain 86.22% of the variation in Y according to the adjusted $R^2$
 
 ### Kfold validation to validate our model
+
 ```{r}
 # for reproducibility
 set.seed(13)
@@ -311,6 +321,7 @@ mspe_rmse <- c(avg_MSPE = mean(mspe_fold), avg_RMSE = mean(sqrt(mspe_fold)))
 
 mspe_rmse
 ```
+
 > Here we see an average MSPE of `r mspe_rmse[1]` and an average RMSE of `r mspe_rmse[2]`
 
 ```{r}
@@ -320,15 +331,18 @@ mse_proj <- (2.981)^2
 # checking values
 mse_proj
 ```
+
 > From the calculation abomve, we can see that the MSPE and MSE have relatively the same magnitude with a difference of around 1.3
 
 ```{r}
 # checking the square root of MSE
 sqrt(mse_proj)
 ```
+
 > The RMSEs have the same magnitude and have a difference of about 0.01. These results seem to indicate that the model is valid at least on average
 
 ## Model Diagnostics
+
 ```{r}
 n <- dim(life_exp_trnsfrm)[1]
 p <- dim(life_exp_trnsfrm)[2]
@@ -336,12 +350,14 @@ p <- dim(life_exp_trnsfrm)[2]
 # print VIF values to check if any are greater than 10
 vif(m1)
 ```
+
 > There are no results greater than 10
 
 ```{r}
 # plotting studentized residual plots
 ols_plot_resid_stud(m1)
 ```
+
 > It seems like obervation 111 may be an outlier
 
 ```{r}
@@ -353,9 +369,11 @@ leverage[whichones]
 ```
 
 ##### Checking influence
+
 ```{r}
 ols_plot_cooksd_chart(m1)
 ```
+
 > However the Cook's Distribution tells us differently
 
 ```{r}
@@ -370,6 +388,7 @@ sort(dffits(m1), decreasing = T)[c(1, 2, 3)]
 # take a look at the ones that are the same across the tests and then remove (pg 14 of chap 10)
 
 ```
+
 > According to the Cook's Distance chart results and the DFFITS results, we may have to remove row 118 instead of row 111.
 
 > Please check Data Cleaning page for columns that were dropped
