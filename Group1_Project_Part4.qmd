@@ -67,7 +67,6 @@ table(life_exp_pt4$alcohol_trnsfrm)[1]
 
 ##### b. You should combine levels of categorical variables at this step if necessary.
 
-
 ```{r}
 # scaling certain columns to keep them within magnitude
 list_to_scale <- c(3, 6, 9, 10, 11, 12, 13, 14, 15)
@@ -119,7 +118,8 @@ FullModel <- lm(longevity ~ ., data = life_exp_pt4)
 summary(FullModel)
 
 ```
-> The variables (P-1) in the full model are: alcohol_trnsfrm, bmi_trnsfrm, tot_exp_trnsfrm, aids_trnsfrm, gdp_trnsfrm, thin_1_19_trnsfrm, inc_comp, adult_mort, hep_b_trnsfrm, measles_trnsfrm, u5_deaths_trnsfrm, polio_trnsfrm, dipth_trnsfrm, pop_trnsfrm, continentAmericas, continentAsia, continentEurope, continentOceania, statusDeveloping
+
+> The variables (P-1) in the full model are: alcohol_trnsfrm, bmi_trnsfrm, tot_exp_trnsfrm, aids_trnsfrm, gdp_trnsfrm, thin_1\_19_trnsfrm, inc_comp, adult_mort, hep_b\_trnsfrm, measles_trnsfrm, u5_deaths_trnsfrm, polio_trnsfrm, dipth_trnsfrm, pop_trnsfrm, continentAmericas, continentAsia, continentEurope, continentOceania, statusDeveloping
 
 ## Part B -- Model Selection Procedures
 
