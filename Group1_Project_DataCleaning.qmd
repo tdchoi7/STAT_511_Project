@@ -44,6 +44,7 @@ library(corrplot)
 ```
 
 ### Renaming variables for ease of use
+
 ```{r}
 # Information regarding data from:
 # https://www.kaggle.com/datasets/kumarajarshi/life-expectancy-who?resource=download
@@ -103,9 +104,11 @@ x <- life_exp[,-4]
 summary(y)
 
 ```
+
 > There are 10 null values in the label
 
 ### Removing rows with null values in the response variables
+
 ```{r}
 # remove the null values and assign the new dataframe with removed nulls to new variable
 life_exp1 <- life_exp[complete.cases(life_exp$longevity),]
@@ -114,6 +117,7 @@ life_exp1 <- life_exp[complete.cases(life_exp$longevity),]
 summary(life_exp1$longevity)
 
 ```
+
 > Removing the null values from the response variable resulted in the removal of 10 rows
 
 ```{r}
@@ -149,6 +153,7 @@ saveRDS(life_exp_2013, filepath_2013)
 ```
 
 ### Continuous Variable correlation matrices
+
 ```{r}
 #| message: false
 #| warning: false
@@ -180,6 +185,7 @@ corr_matrix <- ggpairs(life_exp_2013_cont,
 print(corr_matrix)
 
 ```
+
 > It seems that Income Composition of Resources (Corr: 0.891) and Schooling (Corr: 0.795) are most related to the response. HIV AIDS (Corr: -0.622) also seems to be related to the response
 
 > Thinness of Ages 1 to 19 and Thinness of Ages 5 to 9 seem to be quite correlated/possibly colinear (Corr: 0.925). In the correlation plot, Thinness of Ages 1 to 19 has a correlation to the reponse that is 0.001 greater than that of thinness 5 to 9, so thinness of 5 to 9 will be dropped
@@ -189,6 +195,7 @@ print(corr_matrix)
 > Percent Expenditure on Health as a Percentage of GDP and GDP also seem highly correlated/possibly colinear (Corr: 0.918). Because GDP has a stronger correlation with longevity, Percent Expenditure will be dropped.
 
 ### Discrete Variable correlation matrices
+
 ```{r}
 #| message: false
 #| warning: false
@@ -215,6 +222,7 @@ corr_matrix <- ggpairs(life_exp_2013_disc,
 print(corr_matrix)
 
 ```
+
 > It seems that Adult Mortality (Corr: 0.723) is most related to the response
 
 > Infant Deaths and Under 5 Deaths seem to be quite correlated/possibly colinear (Corr: 0.997). Under 5 deaths seems more correlated with the response variable, so Infant Deaths will be dropped
@@ -222,6 +230,7 @@ print(corr_matrix)
 > Hepatitis B and Diptheria also seem to be correlated/possibly colinear (Corr: 0.711), but neither variable will be dropped
 
 ### Continuous Variable normality visualizations
+
 ```{r}
 # assign column names to variable
 colnames_lifeexp_cont <- names(life_exp_2013_cont)[-1]
@@ -290,11 +299,13 @@ for (i in my_range)
   }
 
 ```
+
 > There seems to be the most non-normality for alcohol
 
 > The transformations performed below will help to increase the cloudlike patternless spread of points when comparing the fitted values to the residuals
 
 ###### alcohol
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -328,9 +339,11 @@ ggplot(data = alcohol_aug_lm,
 boxcox(alcohol_lm)
 
 ```
+
 > The p value for the transformed longevity vs transformed alcohol is `r signif(tidy(summary(alcohol_lm))[2,5], 3)`
 
 ###### perc_exp
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -360,9 +373,11 @@ ggplot(data = perc_exp_aug_lm,
 boxcox(perc_exp_lm)
 
 ```
+
 > The p value for longevity vs the transformed perc_exp is `r signif(tidy(summary(perc_exp_lm))[2,5], 3)`
 
 ###### bmi
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -392,9 +407,11 @@ ggplot(data = bmi_aug_lm,
 boxcox(bmi_lm)
 
 ```
+
 > The p value for longevity vs the transformed bmi is `r signif(tidy(summary(bmi_lm))[2,5], 3)`
 
 ###### tot_exp
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -424,9 +441,11 @@ ggplot(data = tot_exp_aug_lm,
 boxcox(tot_exp_lm)
 
 ```
+
 > The p value for longevity vs the transformed tot_exp is `r signif(tidy(summary(tot_exp_lm))[2,5], 3)`
 
 ###### aids
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -456,9 +475,11 @@ ggplot(data = aids_aug_lm,
 boxcox(aids_lm)
 
 ```
+
 > The p value for longevity vs the transformed aids is `r signif(tidy(summary(aids_lm))[2,5], 3)`
 
 ###### gdp
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -488,9 +509,11 @@ ggplot(data = gdp_aug_lm,
 boxcox(gdp_lm)
 
 ```
+
 > The p value for transformed longevity vs the transformed gdp is `r signif(tidy(summary(gdp_lm))[2,5], 3)`
 
-###### thin_1_19
+###### thin_1\_19
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -520,9 +543,11 @@ ggplot(data = thin_1_19_aug_lm,
 boxcox(thin_1_19_lm)
 
 ```
+
 > The p value for transformed longevity vs the transformed thin_1\_19 is `r signif(tidy(summary(thin_1_19_lm))[2,5], 3)`
 
-###### thin_5_9
+###### thin_5\_9
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -552,9 +577,11 @@ ggplot(data = thin_5_9_aug_lm,
 boxcox(thin_5_9_lm)
 
 ```
+
 > The p value for transformed longevity vs the transformed thin_5\_9 is `r signif(tidy(summary(thin_5_9_lm))[2,5], 3)`
 
 ### Using Transformed data
+
 ```{r}
 # dataframe of continuous columns
 # other numerical variables seem to be counts (some based on per 1000, but still count nonetheless)
@@ -575,6 +602,7 @@ head(life_exp_2013_tfm_cont)
 ```
 
 ### Discrete Variable normality visualizations
+
 ```{r}
 # assign column names to variable
 colnames_lifeexp_disc <- names(life_exp_2013_disc)[-1]
@@ -643,9 +671,11 @@ for (i in my_range)
   }
 
 ```
+
 > It seems that most of the SLR models comparing the response to the numerical predictors produce a small p value, except for Measles and Population
 
 ###### adult_mort
+
 ```{r}
 # transform the independent variable
 # the commented section does spread out the points, but does not seem very helpful for the time being
@@ -682,9 +712,11 @@ ggplot(data = adult_mort_aug_lm,
 boxcox(adult_mort_lm)
 
 ```
+
 > The p value for transformed longevity vs the transformed adult_mort is `r signif(tidy(summary(adult_mort_lm))[2,5], 3)`
 
 ###### inf_death
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -718,9 +750,11 @@ ggplot(data = inf_death_aug_lm,
 boxcox(inf_death_lm)
 
 ```
+
 > The p value for transformed longevity vs the transformed inf_death is `r signif(tidy(summary(inf_death_lm))[2,5], 3)`
 
 ###### hep_b
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -754,9 +788,11 @@ ggplot(data = hep_b_aug_lm,
 boxcox(hep_b_lm)
 
 ```
+
 > The p value for transformed longevity vs the transformed hep_b is `r signif(tidy(summary(hep_b_lm))[2,5], 3)`
 
 ###### measles
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -790,9 +826,11 @@ ggplot(data = measles_aug_lm,
 boxcox(measles_lm)
 
 ```
+
 > The p value for transformed longevity vs the transformed measles is `r signif(tidy(summary(measles_lm))[2,5], 3)`
 
 ###### u5_deaths
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -826,9 +864,11 @@ ggplot(data = u5_deaths_aug_lm,
 boxcox(u5_deaths_lm)
 
 ```
+
 > The p value for transformed longevity vs the transformed u5_deaths is `r signif(tidy(summary(u5_deaths_lm))[2,5], 3)`
 
 ###### polio
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -862,9 +902,11 @@ ggplot(data = polio_aug_lm,
 boxcox(polio_lm)
 
 ```
+
 > The p value for transformed longevity vs the transformed polio is `r signif(tidy(summary(polio_lm))[2,5], 3)`
 
 ###### dipth
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -898,9 +940,11 @@ ggplot(data = dipth_aug_lm,
 boxcox(dipth_lm)
 
 ```
+
 > The p value for transformed longevity vs the transformed dipth is `r signif(tidy(summary(dipth_lm))[2,5], 3)`
 
 ###### pop
+
 ```{r}
 # transform the independent variable
 life_exp_2013 <- life_exp_2013 %>%
@@ -934,9 +978,11 @@ ggplot(data = pop_aug_lm,
 boxcox(pop_lm)
 
 ```
+
 > The p value for transformed longevity vs the transformed pop is `r signif(tidy(summary(pop_lm))[2,5], 3)` which is an improvement over not transforming the variable, but still not significant
 
 # Data transformation to use
+
 ```{r}
 # dataframe of continuous columns
 # other numerical variables seem to be counts (some based on per 1000, but still count nonetheless)
@@ -960,6 +1006,7 @@ life_exp_2013_tfm_num <- cbind(life_exp_2013_tfm_cont,
 head(life_exp_2013_tfm_num)
 
 ```
+
 > There is a possibility that we are not capturing relationships between certain numerical variables because we broke up the analysis between categorical and discrete variables. Below, we can see the scatterplot matrix and correlation matrix for all numerical variables
 
 ```{r}
@@ -990,6 +1037,7 @@ corr_matrix <- ggpairs(life_exp_2013_num,
 ```
 
 ##### Analyzing Factors
+
 ```{r}
 # factorize the categorical variable
 life_exp_2013$country <- factor(life_exp_2013$country)
@@ -1012,6 +1060,7 @@ is.factor(life_exp_2013$status)
 ```
 
 ### b. For EACH categorical predictor separately (one at a time), fit a SLR model
+
 ```{r}
 # # fit the linear model to the categorical variable
 # country.lm <- lm(longevity ~ life_exp_2013$country, data=life_exp_2013)
@@ -1042,11 +1091,13 @@ status.lm <- lm(longevity ~ life_exp_2013$status, data = life_exp_2013)
 # output summary
 summary(status.lm)
 ```
+
 > After looking at the summary for the country, status, and year categorical variables, The F-test of overall significance indicates that the linear regression model provides a better fit to the data than a model that contains no independent variables. This was concluded becuase the p value is less than the t value
 
 > The country variable would be a variable we will collapse (we actually have already done this and have a continents column) as there are too many categories within. With over 180 countries, it is difficult to make a simple regression model and obtain other statistics
 
 ### Findings:
+
 > Some of the variables are associated with our outcome of interest and some of them are not. According to our scatterplot graphs in part 1 and part 2, Alcohol, Percentage Expenditure, BMI, HIV.Aids, GDP, thinness5.9.years, Income.composition.of.resources, and Schooling appear to be associated with our outcome of interest. However, some of them are linearly associated with the outcome, some of them are non-linearly associated, and some of them may be associated but it is difficult to see the proper relationship. For example, Income and Schooling seem to have a strong linear relationship; Percentage Expenditure, HIV, and GDP have non-linear relationships; the thinness columns do not seem to have clear relationships
 
 > We think that some of our predictor variables might interact with one other, and actually we have already discovered some of this kind of relationship. For example in part B in project part 2, we found that Measles is closely related to infant deaths and deaths under 5 years. Scholing and Income Composition also look like they will interact with each other. Thinness 1-19 and Thinness 5-9 also look highly correlated. Based on the current situation of our society, I think some of the predictors is going to affect each other such as percentage expenditure and income, income and GDP, Schooling and GDP, etc.

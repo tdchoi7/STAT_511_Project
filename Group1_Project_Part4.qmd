@@ -230,7 +230,7 @@ summary(m2)
 
 > We will use m1 as our model since the interaction did not help the model
 
-> $\hat{y_i}$ = 53.1917 + 31.9814 x inc_comp + -6.5966 x aids_trnsfrm + 1.4210 x tot_exp_trnsfrm + -1.0755 x adult_mort + -1.7804 x thin_1_19_trnsfrm
+> $\hat{y_i}$ = 53.1917 + 31.9814 x inc_comp + -6.5966 x aids_trnsfrm + 1.4210 x tot_exp_trnsfrm + -1.0755 x adult_mort + -1.7804 x thin_1\_19_trnsfrm
 
 ## Part C -- Preliminary summary
 
@@ -242,7 +242,7 @@ summary(m2)
 
 ##### • Interpret some of the parameters of interest
 
-> According to our regression models, inc_comp, aids_trnsfrm, tot_exp_trnsfrm, adult_mort, and thin_1_19_trnsfrm are the variables that are most asscociated with out outcome of interest. It makes sense that adult mortality will affect life expectancy. It seems that more education (schooling was correlated with income composition) and wealth can afford healthier lifestyles. Seeing how income composition (according to the Human Development Index in terms of income composition of resources - https://www.kaggle.com/datasets/kumarajarshi/life-expectancy-who?resource=download) is so positively correlated with longevity, real world knowledge of the impact of wealth on health is evident. With greater dissemination of technology and information comes the expectation of longer life. In terms of Total Expenditure (which is the government's spending on health), we can see that the more a government spends, the greater the longevity. Mortal diseases such as aids will definitely have a negative impact on longevity as the disease tends to cut life short. Thinness from ages 1-19 will also impact the life expectancy as we can most likely assume that it measures some form of undernourishment. Adult mortality is definitely going to negatively impact longevity as a higher death rate can point to shorter lifespans. The predictor variables explain 86.22% of the variation in Y according to the adjusted $R^2$
+> According to our regression models, inc_comp, aids_trnsfrm, tot_exp_trnsfrm, adult_mort, and thin_1\_19_trnsfrm are the variables that are most asscociated with out outcome of interest. It makes sense that adult mortality will affect life expectancy. It seems that more education (schooling was correlated with income composition) and wealth can afford healthier lifestyles. Seeing how income composition (according to the Human Development Index in terms of income composition of resources - https://www.kaggle.com/datasets/kumarajarshi/life-expectancy-who?resource=download) is so positively correlated with longevity, real world knowledge of the impact of wealth on health is evident. With greater dissemination of technology and information comes the expectation of longer life. In terms of Total Expenditure (which is the government's spending on health), we can see that the more a government spends, the greater the longevity. Mortal diseases such as aids will definitely have a negative impact on longevity as the disease tends to cut life short. Thinness from ages 1-19 will also impact the life expectancy as we can most likely assume that it measures some form of undernourishment. Adult mortality is definitely going to negatively impact longevity as a higher death rate can point to shorter lifespans. The predictor variables explain 86.22% of the variation in Y according to the adjusted $R^2$
 
 ```{r}
 # # Exporting Dataset
