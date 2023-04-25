@@ -148,7 +148,7 @@ filepath_1 <- "./data/longevity Data Cleaned Version.csv"
 filepath_2013 <- "./data/Longevity Data Year 2013 Cleaned.rds"
 
 # save to csv
-saveRDS(life_exp_2013, filepath_2013)
+# saveRDS(life_exp_2013, filepath_2013)
 
 ```
 
