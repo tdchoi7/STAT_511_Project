@@ -1,0 +1,43 @@
+---
+title: "Project Appendix"
+subtitle: "STAT 511"
+author: "Moses Sanches, Shuyu Wang, Theodore Choi"
+date: "`r Sys.Date()`"
+format: 
+  html:
+    self-contained: true
+    toc: true
+    toc_float: true
+    number-section: false
+    highlight: tango
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+```{r}
+#| message: false
+#| warning: false
+# Libraries we used
+library(openintro)
+library(tidyverse)
+library(dplyr)
+library(scales)
+library(leaps)
+library(MASS)
+library(olsrr)
+library(car)
+library(broom)
+library(pastecs)
+library(countrycode)
+library(kableExtra)
+library(moderndive)
+```
+
