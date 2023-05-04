@@ -41,3 +41,25 @@ library(kableExtra)
 library(moderndive)
 ```
 
+> Intro/Background/Significance: We chose to do our research on a dataset that pertained to the longevity of people in various nations. This dataset we chose contains factors pertinent to health, education, economic status, and other demographics including average life expectancy of 193 countries from the years 2000 to 2015. 
+
+> Research Question: Do demographics affect life expectancy?
+
+> Description of Data: The dataset has 22 columns including the response variable and contains 2938 rows. There are binary, categorical, continuous, and discrete data. Missing Data has already been handled using Missmap by the people who sourced this cleaned dataset (originally provided by the WHO) excluded several countries including Vanuatu, Tonga, Togo, and Cabo Verde. The binary variable is the Status column, which indicates if the country is a developing country or a developed country. A variable that can be classified as categorical with more than 2 categories would be the year. And the Alcohol and BMI columns can be continuous variables and the Measles and Population columns could be discrete variables.The original dataset was found on the WHO data repository website and the subsequent transformation was found on Kaggle. The link for the dataset: https://www.kaggle.com/datasets/kumarajarshi/life-expectancy-who?resource=download
+
+
+
+> Brief Methods Section:
+
+
+> Model Results:
+According to our analysis of models, we finally decided that Adult mortality and alcohol should be the most influential factors. At first we built some histograms and plot graphs to compare the connections between different factors and life expectancy. Then step by step we finally built some models in order to decide the factors that affect the most. Our model at last shows that Adult mortality and alcohol are the factors since their p-value is less than 0.05 which means Adult mortality and alcohol should be added in the model.
+
+> Discussion & Limitations:
+
+Besides those listed data, there are still some other factors that affect life expectancy, such as life habits and genetic factors. Our model suggests that  life habits and genetic factors affect the most, schooling and medical treatment are less affected. This is not consistent with other articles. Some potential reasons may be the datasets didn't show the result of medical treatment directly but only show sickness cases. Those case datasets may be replaced by other datasets like cured cases in the future so that we could have a clearer version of the development of medical treatment. Considering Cured cases, factors like them are one of the limitations as well.  Those data are hard to collect, so we have to ignore their possible effects. In the future if those datasets become easier to collect, we could continue researching based on them.
+
+> Limitations:
+
+
+
